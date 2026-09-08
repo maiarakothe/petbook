@@ -1,51 +1,64 @@
+"use client";
+
 import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { Home, Heart, Search, User } from "lucide-react";
+import styles from "./Header.module.css";
 
 export default function Header() {
+  const pathname = usePathname();
+  const isActive = (path: string) => pathname === path;
+
   return (
-    <header className="h-[72px] bg-white border-b border-black/10 flex items-center justify-between px-10">
-      
-      <Image
-        src="/images/logo-lado.png"
-        alt="Logo do PetBook"
-        width={200}
-        height={50}
-      />
+    <header className={styles.header}>
+      <div className={styles.container}>
 
-      <nav className="flex items-center gap-8 h-full">
-        
-        <a
-          href=""
-          className="h-full flex items-center gap-2 px-2 text-[var(--primary)] font-semibold border-b-2 border-[var(--primary)]"
-        >
-          <span>🏠</span>
-          <span>Início</span>
-        </a>
+        <Link href="/" className={styles.logo}>
+          <Image
+            src="/images/logo-lado.png"
+            alt="Logo do PetBook"
+            width={160}
+            height={40}
+            priority
+          />
+        </Link>
 
-        <a
-          href="/adocao"
-          className="flex items-center gap-2 px-2 text-[var(--text-main)] hover:text-[var(--primary)] transition-colors"
-        >
-          <span>🐶</span>
-          <span>Adoção</span>
-        </a>
+        <nav className={styles.nav}>
+          <Link
+            href="/"
+            className={`${styles.link} ${isActive("/") ? styles.active : ""}`}
+          >
+            <Home className="w-5 h-5" />
+            <span>Início</span>
+          </Link>
 
-        <a
-          href="/perdidos"
-          className="flex items-center gap-2 px-2 text-[var(--text-main)] hover:text-[var(--primary)] transition-colors"
-        >
-          <span>🔎</span>
-          <span>Animais perdidos</span>
-        </a>
+          <Link
+            href="/adocao"
+            className={`${styles.link} ${isActive("/adocao") ? styles.active : ""}`}
+          >
+            <Heart className="w-5 h-5" />
+            <span>Adoção</span>
+          </Link>
 
-        <a
-          href="/perfil"
-          className="flex items-center gap-2 px-2 text-[var(--text-main)] hover:text-[var(--primary)] transition-colors"
-        >
-          <span>👤</span>
-          <span>Perfil</span>
-        </a>
+          <Link
+            href="/perdidos"
+            className={`${styles.link} ${isActive("/perdidos") ? styles.active : ""}`}
+          >
+            <Search className="w-5 h-5" />
+            <span>Animais perdidos</span>
+          </Link>
 
-      </nav>
+          <Link
+            href="/perfil"
+            className={`${styles.link} ${isActive("/perfil") ? styles.active : ""}`}
+          >
+            <User className="w-5 h-5" />
+            <span>Perfil</span>
+          </Link>
+        </nav>
+
+      </div>
     </header>
   );
 }
