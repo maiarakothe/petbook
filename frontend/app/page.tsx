@@ -1,3 +1,4 @@
+import CreatePostBox from "@/components/CreatePostBox/CreatePostBox";
 import Header from "@/components/Header/Header";
 
 import PostCard from "@/components/PostCard/PostCard";
@@ -10,11 +11,8 @@ export default function Home() {
      
 
         <main className="feed">
-          <h1>Olá, PetBook! 🐾</h1>
-
-          <p className="subtitle">
-            Veja o que está acontecendo com os pets da comunidade.
-          </p>
+          <CreatePostBox/>
+          
 
           <PostCard
             petName="Thor"
