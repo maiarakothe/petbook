@@ -6,6 +6,16 @@
   --bg-offwhite: #f4f1de;
   --text-main: #2b2d42;
   --background: #f4f1de;
+
+  --success: #2a9d8f;
+  --success-light: #e6f4f1;
+  
+  --warning: #f4a261;
+  --warning-light: #fdf6ed;
+  
+  --error: #e76f51;
+  --error-light: #fdf2f0;
+  
   --border-radius: 16px;
 }
 
