@@ -6,7 +6,6 @@ import PostCard from "@/components/PostCard/PostCard";
 export default function Home() {
   return (
     <div>
-      <Header />
       <div className="layout">
      
 

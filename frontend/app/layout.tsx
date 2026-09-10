@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import HeaderConditional from "@/components/Header/HeaderConditional";
 
 export const metadata: Metadata = {
   title: "PetBook",
@@ -13,6 +14,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR">
+      <HeaderConditional />
       <body>{children}</body>
     </html>
   );
