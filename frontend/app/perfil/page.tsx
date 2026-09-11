@@ -3,10 +3,16 @@
 import { useState } from "react";
 import PetMenu from "@/components/Perfil/PetMenu";
 import PetProfile from "@/components/Perfil/PetProfile";
+import UserProfile from "@/components/Perfil/UserProfile";
 
 
 export default function PerfilPage() {
   const [petSelecionado, setPetSelecionado] = useState(0);
+
+  const usuario = {
+    nome: 'teste',
+    email: 'teste@gmail.com'
+  };
 
   const pets = [
     {
@@ -14,9 +20,8 @@ export default function PerfilPage() {
       username: "@mel_pet",
       tipo: "Cachorro",
       raca: "Golden Retriever",
+      localizacao: 'jj',
       idade: "3 anos",
-      seguidores: 24,
-      seguindo: 18,
       publicacoes: 18,
       foto: "",
     },
@@ -25,9 +30,8 @@ export default function PerfilPage() {
       username: "@thor_pet",
       tipo: "Gato",
       raca: "Siamês",
+      localizacao: '',
       idade: "2 anos",
-      seguidores: 12,
-      seguindo: 9,
       publicacoes: 9,
       foto: "",
     },
@@ -37,6 +41,7 @@ export default function PerfilPage() {
     <main className="min-h-screen bg-[var(--background)]">
       <div className="max-w-6xl mx-auto px-6 py-10">
 
+        <UserProfile usuario={usuario} />
         <div className="flex gap-6">
           <PetMenu
             pets={pets}

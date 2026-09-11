@@ -14,8 +14,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR">
-      <HeaderConditional />
-      <body>{children}</body>
+      <body>
+        <HeaderConditional />
+        {children}
+      </body>
     </html>
   );
 }

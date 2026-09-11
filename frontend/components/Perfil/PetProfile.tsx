@@ -5,9 +5,8 @@ type Pet = {
   username: string;
   tipo: string;
   raca: string;
+  localizacao: string;
   idade: string;
-  seguidores: number;
-  seguindo: number;
   publicacoes: number;
   foto: string;
 };
@@ -29,6 +28,8 @@ export default function PetProfile({ pet }: PetProfileProps) {
             <Image
               src={pet.foto}
               alt={pet.nome}
+              width={200}
+              height={200}
               className="w-32 h-32 rounded-full object-cover"
             />
 
@@ -62,26 +63,6 @@ export default function PetProfile({ pet }: PetProfileProps) {
                   </p>
                 </div>
 
-                <div>
-                  <strong className="text-[var(--secondary)]">
-                    {pet.seguidores}
-                  </strong>
-
-                  <p className="text-xs text-gray-500">
-                    seguidores
-                  </p>
-                </div>
-
-                <div>
-                  <strong className="text-[var(--secondary)]">
-                    {pet.seguindo}
-                  </strong>
-
-                  <p className="text-xs text-gray-500">
-                    seguindo
-                  </p>
-                </div>
-
               </div>
 
             </div>
@@ -99,6 +80,10 @@ export default function PetProfile({ pet }: PetProfileProps) {
 
             <span className="px-3 py-1.5 rounded-full bg-[var(--background)] text-sm">
               🎂 {pet.idade}
+            </span>
+
+            <span className="px-3 py-1.5 rounded-full bg-[var(--background)] text-sm">
+              📍 {pet.localizacao}
             </span>
 
           </div>

@@ -4,7 +4,6 @@ type Pet = {
   nome: string;
   username: string;
   foto: string;
-  seguidores: number;
 };
 
 type PetMenuProps = {
@@ -35,18 +34,19 @@ export default function PetMenu({
             <button
               key={pet.username}
               onClick={() => onSelect(index)}
-              className={`w-full flex items-center gap-3 p-3 rounded-xl text-left transition ${
-                petSelecionado === index
+              className={`w-full flex items-center gap-3 p-3 rounded-xl text-left transition ${petSelecionado === index
                   ? "bg-[var(--secondary)]/10 border border-[var(--secondary)]/30"
                   : "hover:bg-gray-50 border border-transparent"
-              }`}
+                }`}
             >
               <Image
                 src={pet.foto}
                 alt={pet.nome}
+                width={200}
+                height={200}
                 className="w-12 h-12 rounded-full object-cover"
               />
-        
+
 
               <div>
                 <p className="font-semibold text-[var(--secondary)]">

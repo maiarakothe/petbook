@@ -1,5 +1,4 @@
 import CreatePostBox from "@/components/CreatePostBox/CreatePostBox";
-import Header from "@/components/Header/Header";
 
 import PostCard from "@/components/PostCard/PostCard";
 
@@ -7,11 +6,11 @@ export default function Home() {
   return (
     <div>
       <div className="layout">
-     
+
 
         <main className="feed">
-          <CreatePostBox/>
-          
+          <CreatePostBox />
+
 
           <PostCard
             petName="Thor"
