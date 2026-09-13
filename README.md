@@ -96,6 +96,10 @@ Next.js
 
 NestJS
 
+### ORM
+
+Prisma
+
 ### Banco de dados
 
 PostgreSQL ou MySQL
