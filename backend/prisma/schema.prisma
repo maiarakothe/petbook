@@ -9,3 +9,32 @@ datasource db {
 
 
 // Depois de você fazer qualquer alteração nesse arquivo executa: npx prisma generate
+
+model Usuario {
+
+  id String @id @default(uuid())
+  nome String
+  email String
+  senha String
+  @@map("usuarios")
+
+}
+
+model Pet {
+
+  id String @id @default(uuid())
+  nome String
+  raca String
+  tipo_animal String
+  idade Int
+  localizacao String
+  @@map("pets")
+}
+
+model Publicacao {
+
+  id String @id @default(uuid())
+  //foto
+  legenda String
+  @@map("publicacoes")
+}
