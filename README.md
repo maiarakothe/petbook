@@ -4,6 +4,10 @@ O **PetBook** é uma rede social voltada para animais de estimação, inspirada 
 
 ## 📋 Requisitos / marcado como concluida porque foi realizada no front, falta o backend
 
+### Falta fazer principal:
+- [ ] Dialog/modal para cadastrar o pet
+- [ ] Na publicação adicionar opção de poder escolher qual pet vai estar fazendo a publicação
+
 ### 🔐 Autenticação e usuários
 
 - [x] Cadastro de usuário
@@ -118,4 +122,23 @@ PostgreSQL ou MySQL
 - [ ] Área de animais perdidos
 - [x] Área de publicações
 - [x] Menu de navegação
-- [ ] 
+
+
+## 👨‍💻 Desenvolvedores
+
+<table>
+  <tr>
+    <td align="center">
+      <a href="https://github.com/maiarakothe" style="text-decoration: none; color: inherit;">
+        <img src="https://avatars.githubusercontent.com/u/160647563?v=4" width="115"><br>
+        <strong>Maiara Braun Kothe</strong>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/MatheusBamberg" style="text-decoration: none; color: inherit;">
+        <img src="https://avatars.githubusercontent.com/u/204625992?v=4" width="115"><br>
+        <strong>Matheus Scherer Bamberg</strong>
+      </a>
+    </td>
+  </tr>
+</table>
