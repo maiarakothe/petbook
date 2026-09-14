@@ -10,12 +10,14 @@ type PetMenuProps = {
   pets: Pet[];
   petSelecionado: number;
   onSelect: (index: number) => void;
+  onAdicionar: () => void;
 };
 
 export default function PetMenu({
   pets,
   petSelecionado,
   onSelect,
+  onAdicionar
 }: PetMenuProps) {
   return (
     <aside className="w-64 shrink-0">
@@ -35,8 +37,8 @@ export default function PetMenu({
               key={pet.username}
               onClick={() => onSelect(index)}
               className={`w-full flex items-center gap-3 p-3 rounded-xl text-left transition ${petSelecionado === index
-                  ? "bg-[var(--secondary)]/10 border border-[var(--secondary)]/30"
-                  : "hover:bg-gray-50 border border-transparent"
+                ? "bg-[var(--secondary)]/10 border border-[var(--secondary)]/30"
+                : "hover:bg-gray-50 border border-transparent"
                 }`}
             >
               <Image
@@ -67,7 +69,7 @@ export default function PetMenu({
           ))}
         </div>
 
-        <button className="w-full mt-4 py-3 rounded-xl border-2 border-dashed border-[var(--primary)]/30 text-[var(--primary)] text-sm font-semibold">
+        <button type="button" onClick={onAdicionar} className="w-full mt-4 py-3 rounded-xl border-2 border-dashed border-[var(--primary)]/30 text-[var(--primary)] text-sm font-semibold">
           + Adicionar pet
         </button>
 

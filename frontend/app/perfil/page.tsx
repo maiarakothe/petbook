@@ -4,10 +4,12 @@ import { useState } from "react";
 import PetMenu from "@/components/Perfil/PetMenu";
 import PetProfile from "@/components/Perfil/PetProfile";
 import UserProfile from "@/components/Perfil/UserProfile";
+import PetDialog from "@/components/Perfil/PetDialog";
 
 
 export default function PerfilPage() {
   const [petSelecionado, setPetSelecionado] = useState(0);
+  const [dialogPetAberto, setDialogPetAberto] = useState(false);
 
   const usuario = {
     nome: 'teste',
@@ -47,9 +49,17 @@ export default function PerfilPage() {
             pets={pets}
             petSelecionado={petSelecionado}
             onSelect={setPetSelecionado}
+            onAdicionar={() => setDialogPetAberto(true)}
           />
 
           <PetProfile pet={pets[petSelecionado]} />
+          <PetDialog
+            aberto={dialogPetAberto}
+            onClose={() => setDialogPetAberto(false)}
+            onCadastrar={(pet) => {
+              console.log("Pet cadastrado:", pet);
+            }}
+          />
         </div>
 
       </div>
