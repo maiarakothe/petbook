@@ -2,7 +2,6 @@ import Image from "next/image";
 
 type Pet = {
   nome: string;
-  username: string;
   foto: string;
 };
 
@@ -34,7 +33,7 @@ export default function PetMenu({
         <div className="space-y-2">
           {pets.map((pet, index) => (
             <button
-              key={pet.username}
+              key={pet.nome}
               onClick={() => onSelect(index)}
               className={`w-full flex items-center gap-3 p-3 rounded-xl text-left transition ${petSelecionado === index
                 ? "bg-[var(--secondary)]/10 border border-[var(--secondary)]/30"
@@ -50,15 +49,10 @@ export default function PetMenu({
               />
 
 
-              <div>
                 <p className="font-semibold text-[var(--secondary)]">
                   {pet.nome}
                 </p>
-
-                <p className="text-xs text-gray-500">
-                  {pet.username}
-                </p>
-              </div>
+             
 
               {petSelecionado === index && (
                 <span className="ml-auto text-[var(--secondary)]">

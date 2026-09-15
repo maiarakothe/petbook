@@ -2,7 +2,6 @@ import Image from "next/image";
 
 type Pet = {
   nome: string;
-  username: string;
   tipo: string;
   raca: string;
   localizacao: string;
@@ -40,10 +39,6 @@ export default function PetProfile({ pet }: PetProfileProps) {
                   <h1 className="text-3xl font-bold text-[var(--secondary)]">
                     {pet.nome}
                   </h1>
-
-                  <p className="text-gray-500">
-                    {pet.username}
-                  </p>
                 </div>
 
                 <button className="ml-auto px-5 py-2 rounded-xl bg-[var(--primary)] text-white font-semibold">

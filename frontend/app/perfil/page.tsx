@@ -19,7 +19,6 @@ export default function PerfilPage() {
   const pets = [
     {
       nome: "Mel",
-      username: "@mel_pet",
       tipo: "Cachorro",
       raca: "Golden Retriever",
       localizacao: 'jj',
@@ -29,7 +28,6 @@ export default function PerfilPage() {
     },
     {
       nome: "Thor",
-      username: "@thor_pet",
       tipo: "Gato",
       raca: "Siamês",
       localizacao: '',
