@@ -11,6 +11,19 @@ export default function CreatePostBox() {
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
+    const pets = [
+        {
+            nome: "Mel",
+            foto: "/images/mel.jpg",
+        },
+        {
+            nome: "Thor",
+            foto: "/images/thor.jpg",
+        },
+    ];
+
+    const [petSelecionado, setPetSelecionado] = useState(0);
+
     const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
@@ -26,9 +39,17 @@ export default function CreatePostBox() {
 
     const handlePostSubmit = (e: SyntheticEvent) => {
         e.preventDefault();
-        if (!content.trim() && !selectedImage) return;
 
-        console.log("Enviando post:", { content, postType, selectedImage });
+        if (!content.trim() && !selectedImage) {
+            return;
+        }
+
+        console.log("Enviando post:", {
+            content,
+            postType,
+            selectedImage,
+            pet: pets[petSelecionado],
+        });
 
         setContent("");
         setSelectedImage(null);
@@ -65,10 +86,36 @@ export default function CreatePostBox() {
             <form onSubmit={handlePostSubmit}>
                 <div className={styles.formContent}>
                     <div className={styles.avatar}>
-                        🐶
+                        <Image
+                            src={pets[petSelecionado].foto}
+                            alt={pets[petSelecionado].nome}
+                            width={48}
+                            height={48}
+                            className="h-12 w-12 rounded-full object-cover"
+                        />
                     </div>
 
                     <div className={styles.textareaContainer}>
+
+                        <div className="mb-3">
+                            <select
+                                value={petSelecionado}
+                                onChange={(e) =>
+                                    setPetSelecionado(Number(e.target.value))
+                                }
+                                className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-semibold text-[var(--secondary)] outline-none transition focus:border-[var(--primary)]"
+                            >
+                                {pets.map((pet, index) => (
+                                    <option
+                                        key={pet.nome}
+                                        value={index}
+                                    >
+                                        Publicar como {pet.nome}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
                         <textarea
                             value={content}
                             onChange={(e) => setContent(e.target.value)}

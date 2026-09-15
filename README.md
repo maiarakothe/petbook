@@ -24,7 +24,7 @@ O **PetBook** é uma rede social voltada para animais de estimação, inspirada 
   - [x] Publicação comum
   - [x] Animal perdido
   - [x] Animal para adoção
-- [ ] ***Fazer** Na publicação adicionar opção de poder escolher qual pet vai estar fazendo a publicação
+- [x] Na publicação adicionar opção de poder escolher qual pet vai estar fazendo a publicação
 
 ### ❤️ Interações
 
