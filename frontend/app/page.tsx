@@ -1,16 +1,27 @@
-import CreatePostBox from "@/components/CreatePostBox/CreatePostBox";
+"use client";
 
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+
+import CreatePostBox from "@/components/CreatePostBox/CreatePostBox";
 import PostCard from "@/components/PostCard/PostCard";
 
 export default function Home() {
+  const router = useRouter();
+
+  useEffect(() => {
+    const token = localStorage.getItem("petbook_token");
+
+    if (!token) {
+      router.push("/login");
+    }
+  }, [router]);
+
   return (
     <div>
       <div className="layout">
-
-
         <main className="feed">
           <CreatePostBox />
-
 
           <PostCard
             petName="Thor"
