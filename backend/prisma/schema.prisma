@@ -16,25 +16,50 @@ model Usuario {
   nome String
   email String @unique
   senha String
-  @@map("usuarios")
 
+  pets Pet[]
+  publicacoes Publicacao[]
+
+  @@map("usuarios")
 }
 
 model Pet {
 
   id String @id @default(uuid())
   nome String
+  foto String
   raca String
   tipo_animal String
   idade Int
   localizacao String
+
+  usuarioId String
+  usuario Usuario @relation(fields: [usuarioId], references: [id])
+
+  publicacoes Publicacao[]
+
   @@map("pets")
 }
 
 model Publicacao {
 
   id String @id @default(uuid())
-  //foto
+  foto String
   legenda String
+  tipo TipoPublicacao
+
+  usuarioId String
+  usuario Usuario @relation(fields: [usuarioId], references: [id])
+
+  petId String
+  pet Pet @relation(fields: [petId], references: [id])
+
   @@map("publicacoes")
+}
+
+
+enum TipoPublicacao {
+  COMUM
+  PERDIDO
+  ADOCAO
 }
