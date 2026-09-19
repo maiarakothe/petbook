@@ -110,6 +110,16 @@ Executar o projeto
 npm run dev
 ```
 
+Entre na pasta do backend
+```bash
+cd backend
+```
+
+Executar o backend
+```bash
+npm run start
+```
+
 ## 👨‍💻 Desenvolvedores
 
 <table>
