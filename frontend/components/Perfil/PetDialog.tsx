@@ -13,7 +13,7 @@ interface PetDialogProps {
         idade: string;
         localizacao: string;
         foto: File | null;
-    }) => void;
+    }) => Promise<void>;
 }
 
 export default function PetDialog({
@@ -44,12 +44,12 @@ export default function PetDialog({
         setFotoPreview(URL.createObjectURL(arquivo));
     }
 
-    function cadastrar() {
-        if (!nome || !tipo) {
+    async function cadastrar() {
+        if (!nome || !tipo || !foto) {
             return;
         }
 
-        onCadastrar({
+        await onCadastrar({
             nome,
             raca,
             tipo,
@@ -65,8 +65,6 @@ export default function PetDialog({
         setLocalizacao("");
         setFoto(null);
         setFotoPreview("");
-
-        onClose();
     }
 
     return (
@@ -191,7 +189,8 @@ export default function PetDialog({
                                 type="text"
                                 value={idade}
                                 onChange={(event) => setIdade(event.target.value)}
-                                placeholder="Ex: 3 anos"
+                                placeholder="Ex: 3 anos ou 8 meses"
+                                required
                                 className="h-12 w-full rounded-xl border border-gray-200 px-4 outline-none transition focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20"
                             />
                         </div>

@@ -30,7 +30,7 @@ model Pet {
   foto String
   raca String
   tipo_animal String
-  idade Int
+  idade String
   localizacao String
 
   usuarioId String

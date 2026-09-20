@@ -1,6 +1,7 @@
 import Image from "next/image";
 
 type Pet = {
+  id: string;
   nome: string;
   foto: string;
 };
@@ -18,6 +19,12 @@ export default function PetMenu({
   onSelect,
   onAdicionar
 }: PetMenuProps) {
+  function getFotoUrl(foto: string) {
+    return foto.startsWith("http")
+      ? foto
+      : `${process.env.NEXT_PUBLIC_API_URL}${foto}`;
+  }
+
   return (
     <aside className="w-64 shrink-0">
       <div className="bg-white rounded-2xl border border-black/5 shadow-sm p-4">
@@ -33,7 +40,7 @@ export default function PetMenu({
         <div className="space-y-2">
           {pets.map((pet, index) => (
             <button
-              key={pet.nome}
+              key={pet.id}
               onClick={() => onSelect(index)}
               className={`w-full flex items-center gap-3 p-3 rounded-xl text-left transition ${petSelecionado === index
                 ? "bg-[var(--secondary)]/10 border border-[var(--secondary)]/30"
@@ -41,18 +48,19 @@ export default function PetMenu({
                 }`}
             >
               <Image
-                src={pet.foto}
+                src={getFotoUrl(pet.foto)}
                 alt={pet.nome}
                 width={200}
                 height={200}
+                unoptimized
                 className="w-12 h-12 rounded-full object-cover"
               />
 
 
-                <p className="font-semibold text-[var(--secondary)]">
-                  {pet.nome}
-                </p>
-             
+              <p className="font-semibold text-[var(--secondary)]">
+                {pet.nome}
+              </p>
+
 
               {petSelecionado === index && (
                 <span className="ml-auto text-[var(--secondary)]">

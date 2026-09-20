@@ -1,12 +1,13 @@
 import Image from "next/image";
 
 type Pet = {
+  id: string;
   nome: string;
-  tipo: string;
+  tipo_animal: string;
   raca: string;
   localizacao: string;
-  idade: string;
-  publicacoes: number;
+  idade: number;
+  publicacoes?: number;
   foto: string;
 };
 
@@ -15,31 +16,29 @@ type PetProfileProps = {
 };
 
 export default function PetProfile({ pet }: PetProfileProps) {
+  const fotoUrl = pet.foto.startsWith("http")
+    ? pet.foto
+    : `${process.env.NEXT_PUBLIC_API_URL}${pet.foto}`;
+
   return (
     <section className="flex-1 min-w-0">
-
       <div className="bg-white rounded-2xl border border-black/5 shadow-sm overflow-hidden">
-
         <div className="p-8">
-
           <div className="flex items-start gap-6">
-
             <Image
-              src={pet.foto}
+              src={fotoUrl}
               alt={pet.nome}
               width={200}
               height={200}
+              unoptimized
               className="w-32 h-32 rounded-full object-cover"
             />
 
             <div className="flex-1">
-
               <div className="flex items-center gap-4">
-                <div>
-                  <h1 className="text-3xl font-bold text-[var(--secondary)]">
-                    {pet.nome}
-                  </h1>
-                </div>
+                <h1 className="text-3xl font-bold text-[var(--secondary)]">
+                  {pet.nome}
+                </h1>
 
                 <button className="ml-auto px-5 py-2 rounded-xl bg-[var(--primary)] text-white font-semibold">
                   Editar pet
@@ -47,26 +46,22 @@ export default function PetProfile({ pet }: PetProfileProps) {
               </div>
 
               <div className="flex gap-8 mt-6">
-
                 <div>
                   <strong className="text-[var(--secondary)]">
-                    {pet.publicacoes}
+                    {pet.publicacoes ?? 0}
                   </strong>
 
                   <p className="text-xs text-gray-500">
                     publicações
                   </p>
                 </div>
-
               </div>
-
             </div>
           </div>
 
           <div className="flex gap-2 mt-7">
-
             <span className="px-3 py-1.5 rounded-full bg-[var(--background)] text-sm">
-              🐾 {pet.tipo}
+              🐾 {pet.tipo_animal}
             </span>
 
             <span className="px-3 py-1.5 rounded-full bg-[var(--background)] text-sm">
@@ -80,17 +75,13 @@ export default function PetProfile({ pet }: PetProfileProps) {
             <span className="px-3 py-1.5 rounded-full bg-[var(--background)] text-sm">
               📍 {pet.localizacao}
             </span>
-
           </div>
-
         </div>
 
         <div className="border-t border-black/5" />
 
         <div className="p-8">
-
           <div className="flex items-center justify-between mb-5">
-
             <h2 className="text-xl font-bold text-[var(--secondary)]">
               Publicações de {pet.nome}
             </h2>
@@ -98,21 +89,15 @@ export default function PetProfile({ pet }: PetProfileProps) {
             <button className="px-4 py-2 rounded-xl bg-[var(--primary)] text-white text-sm font-semibold">
               + Publicar
             </button>
-
           </div>
 
           <div className="grid grid-cols-3 gap-3">
-
             <div className="aspect-square bg-gray-100 rounded-xl" />
             <div className="aspect-square bg-gray-100 rounded-xl" />
             <div className="aspect-square bg-gray-100 rounded-xl" />
-
           </div>
-
         </div>
-
       </div>
-
     </section>
   );
 }
