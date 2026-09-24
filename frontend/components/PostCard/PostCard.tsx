@@ -10,6 +10,7 @@ import { useState } from "react";
 
 interface PostCardProps {
   petName: string;
+  petFoto: string;
   type: string;
   image: string;
   caption: string;
@@ -17,14 +18,22 @@ interface PostCardProps {
 
 export default function PostCard({
   petName,
+  petFoto,
   type,
   image,
   caption,
 }: PostCardProps) {
   const [curtido, setCurtido] = useState(false);
 
+  const tipoClasse =
+    type === "Animal Perdido"
+      ? styles.perdido
+      : type === "Adoção"
+        ? styles.adocao
+        : "";
+
   return (
-    <article className={styles.card}>
+    <article className={`${styles.card} ${tipoClasse}`}>
       <div className={styles.header}>
         <div className={styles.pet}>
           <div className={styles.avatar}>
@@ -36,7 +45,15 @@ export default function PostCard({
           </div>
         </div>
 
-        <span className={styles.type}>
+        <span
+          className={`${styles.type} ${
+            type === "Animal Perdido"
+              ? styles.typePerdido
+              : type === "Adoção"
+                ? styles.typeAdocao
+                : ""
+          }`}
+        >
           {type}
         </span>
       </div>

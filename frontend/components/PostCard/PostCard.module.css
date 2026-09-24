@@ -43,15 +43,28 @@
 
 .type {
   padding: 6px 10px;
-
   border-radius: 20px;
-
   background: rgba(224, 122, 95, 0.12);
-
   color: var(--primary);
-
   font-size: 12px;
   font-weight: 600;
+}
+
+.perdido {
+  border-top: 5px solid var(--error);
+  border-left: 1px solid var(--error);
+  border-right: 1px solid var(--error);
+  border-bottom: 1px solid var(--error);
+}
+
+.typePerdido {
+  background: rgba(217, 83, 79, 0.12);
+  color: var(--error);
+}
+
+.typeAdocao {
+  background: rgba(29, 53, 87, 0.12);
+  color: var(--secondary);
 }
 
 .image {
@@ -87,5 +100,5 @@
 }
 
 .actions button.liked {
-    color: #f5c542;
+  color: #f5c542;
 }
