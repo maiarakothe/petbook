@@ -1,9 +1,11 @@
 "use client";
 
 import styles from "./PostCard.module.css";
+
 import Image from "next/image";
 
 import { Star, MessageCircle } from "lucide-react";
+
 import { useState } from "react";
 
 interface PostCardProps {
@@ -19,12 +21,11 @@ export default function PostCard({
   image,
   caption,
 }: PostCardProps) {
-  const [curtido, setCurtido] = useState(false)
+  const [curtido, setCurtido] = useState(false);
+
   return (
     <article className={styles.card}>
-
       <div className={styles.header}>
-
         <div className={styles.pet}>
           <div className={styles.avatar}>
             🐶
@@ -38,36 +39,39 @@ export default function PostCard({
         <span className={styles.type}>
           {type}
         </span>
-
       </div>
-
 
       <Image
         src={image}
         alt={`Foto de ${petName}`}
         className={styles.image}
-        width={200}
-        height={50}
+        width={600}
+        height={400}
       />
-      <div className={styles.content}>
 
+      <div className={styles.content}>
         <p>{caption}</p>
 
         <div className={styles.actions}>
+          <button
+            type="button"
+            onClick={() => setCurtido(!curtido)}
+            className={curtido ? styles.liked : ""}
+          >
+            <Star
+              size={22}
+              fill={curtido ? "currentColor" : "none"}
+            />
 
-          <button type="button" onClick={() => setCurtido(!curtido)} className={curtido ? styles.liked : ""}>
-            <Star size={22} fill={curtido ? "currentColor" : "none"} />
             <span>24</span>
           </button>
 
-          <button >
+          <button type="button">
             <MessageCircle size={22} />
             <span>8</span>
           </button>
         </div>
-
       </div>
-
     </article>
   );
 }
