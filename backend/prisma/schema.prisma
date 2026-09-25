@@ -7,34 +7,48 @@ datasource db {
   provider = "postgresql"
 }
 
-
 // Depois de você fazer qualquer alteração nesse arquivo executa: npx prisma generate
+//tmb roda: npx prisma migrate dev
 
 model Usuario {
+  idUsuario   String   @id @default(uuid())
+  nome        String
+  email       String
+  senha       String
+  dataCriacao DateTime @default(now())
+  pets        Pet[]
 
-  id String @id @default(uuid())
-  nome String
-  email String
-  senha String
   @@map("usuarios")
-
 }
 
 model Pet {
-
-  id String @id @default(uuid())
-  nome String
-  raca String
+  idPet       String       @id @default(uuid())
+  nome        String
+  raca        String
   tipo_animal String
-  idade Int
+  idade       Int
   localizacao String
+  idUsuario   String
+  usuario     Usuario      @relation(fields: [idUsuario], references: [idUsuario])
+  publicacoes Publicacao[]
+
   @@map("pets")
 }
 
 model Publicacao {
-
-  id String @id @default(uuid())
+  idPubli    String       @id @default(uuid())
   //foto
-  legenda String
+  legenda    String
+  idPet      String
+  pet        Pet          @relation(fields: [idPet], references: [idPet])
+  comentario Comentario[]
+
   @@map("publicacoes")
+}
+
+model Comentario {
+  idComen    String     @id @default(uuid())
+  texto      String
+  idPubli    String
+  publicacao Publicacao @relation(fields: [idPubli], references: [idPubli])
 }
