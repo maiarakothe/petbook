@@ -1,6 +1,6 @@
 generator client {
-  provider     = "prisma-client"
-  output       = "../generated/prisma"
+  provider = "prisma-client"
+  output   = "../generated/prisma"
   moduleFormat = "cjs"
 }
 
@@ -10,6 +10,7 @@ datasource db {
 
 
 // Depois de você fazer qualquer alteração nesse arquivo executa: npx prisma generate
+//e: npx prisma migrate dev
 
 model Usuario {
 
@@ -20,6 +21,7 @@ model Usuario {
 
   pets Pet[]
   publicacoes Publicacao[]
+  curtida Curtida[]
 
   @@map("usuarios")
 }
@@ -55,9 +57,24 @@ model Publicacao {
   petId String
   pet Pet @relation(fields: [petId], references: [id])
 
+  curtida Curtida[]
+
   @@map("publicacoes")
 }
 
+model Curtida {
+  id String @id @default(uuid())
+
+  usuarioId String
+  publicacaoId String
+
+  usuario Usuario @relation(fields: [usuarioId], references: [id])
+  publicacao Publicacao @relation(fields: [publicacaoId], references: [id])
+
+  @@unique([usuarioId, publicacaoId])
+
+  @@map("curtidas")
+}
 
 enum TipoPublicacao {
   COMUM
