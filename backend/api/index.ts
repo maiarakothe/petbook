@@ -10,8 +10,9 @@ async function bootstrap(): Promise<Express> {
   const app = await NestFactory.create(AppModule);
 
   app.enableCors({
-    origin: true,
-    credentials: true,
+    origin: '*',
+    methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Authorization', 'Content-Type'],
   });
 
   await app.init();
