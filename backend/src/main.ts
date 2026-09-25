@@ -5,7 +5,11 @@ export async function createApp() {
   const app = await NestFactory.create(AppModule);
 
   app.enableCors({
-    origin: process.env.CORS_ORIGIN?.split(',').map((origin) => origin.trim()),
+    origin: process.env.CORS_ORIGIN?.split(',').map((origin) => origin.trim()) ?? [
+      'http://localhost:3000',
+      'https://petbook-o5s0d8zvk-maiarakothes-projects.vercel.app',
+      'https://petbook-ntvx8z9zl-maiarakothes-projects.vercel.app',
+    ],
     credentials: true,
   });
 
