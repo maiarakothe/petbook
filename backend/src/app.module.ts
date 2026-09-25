@@ -1,7 +1,5 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -10,6 +8,7 @@ import { DatabaseModule } from './database/database.module';
 import { AuthModule } from './auth/auth.module';
 import { PetsModule } from './pets/pets.module';
 import { PublicacoesModule } from './publicacao/publicacoes.module';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
 
 @Module({
   imports: [
@@ -17,15 +16,11 @@ import { PublicacoesModule } from './publicacao/publicacoes.module';
       isGlobal: true,
     }),
 
-    ServeStaticModule.forRoot({
-      rootPath: join(process.cwd(), 'uploads'),
-      serveRoot: '/uploads',
-    }),
-
     DatabaseModule,
     AuthModule,
     PetsModule,
     PublicacoesModule,
+    CloudinaryModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,14 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import { CreatePublicacaoDto } from './dto/create-publicacao.dto';
-
-import { join } from 'path';
-import { mkdir, writeFile } from 'fs/promises';
+import { CloudinaryService } from '../cloudinary/cloudinary.service';
 
 @Injectable()
 export class PublicacoesService {
     constructor(
         private readonly prisma: PrismaService,
+        private readonly cloudinaryService: CloudinaryService,
     ) { }
 
     async create(
@@ -16,26 +15,9 @@ export class PublicacoesService {
         usuarioId: string,
         foto: Express.Multer.File,
     ) {
-        const uploadsPath = join(
-            process.cwd(),
-            'uploads',
-        );
-
-        await mkdir(uploadsPath, {
-            recursive: true,
-        });
-
-        const nomeArquivo =
-            `${Date.now()}-${foto.originalname}`;
-
-        const caminhoArquivo = join(
-            uploadsPath,
-            nomeArquivo,
-        );
-
-        await writeFile(
-            caminhoArquivo,
-            foto.buffer,
+        const fotoUrl = await this.cloudinaryService.uploadImage(
+            foto,
+            'petbook/publicacoes',
         );
 
         let tipo: 'COMUM' | 'PERDIDO' | 'ADOCAO';
@@ -51,7 +33,7 @@ export class PublicacoesService {
         const publicacao =
             await this.prisma.publicacao.create({
                 data: {
-                    foto: `/uploads/${nomeArquivo}`,
+                    foto: fotoUrl,
                     legenda: dto.legenda,
                     tipo,
 
