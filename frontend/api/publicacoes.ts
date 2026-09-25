@@ -1,5 +1,4 @@
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL;
+import { API_URL } from '@/lib/api';
 
 export async function createPublicacao(
   publicacao: {
@@ -52,7 +51,7 @@ export async function createPublicacao(
       Array.isArray(data.message)
         ? data.message.join(', ')
         : data.message ||
-            'Erro ao criar publicação.',
+        'Erro ao criar publicação.',
     );
   }
 
