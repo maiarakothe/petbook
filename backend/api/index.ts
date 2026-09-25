@@ -1,11 +1,27 @@
-let handler: any;
+import type { Express, Request, Response } from 'express';
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from '../src/app.module';
 
-export default async function (req: any, res: any) {
-  if (!handler) {
-    const { createApp } = await import('../src/main');
-    const app = await createApp();
-    handler = app.getHttpAdapter().getInstance();
-  }
+let server: Express | undefined;
 
-  return handler(req, res);
+async function bootstrap(): Promise<Express> {
+  if (server) return server;
+
+  const app = await NestFactory.create(AppModule);
+
+  app.enableCors({
+    origin: true,
+    credentials: true,
+  });
+
+  await app.init();
+  server = app.getHttpAdapter().getInstance() as Express;
+  return server;
+}
+
+export const maxDuration = 60;
+
+export default async function handler(request: Request, response: Response) {
+  const instance = await bootstrap();
+  instance(request, response);
 }
