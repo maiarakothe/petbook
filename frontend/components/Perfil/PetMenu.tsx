@@ -1,8 +1,8 @@
 import Image from "next/image";
 
 type Pet = {
+  id: string;
   nome: string;
-  username: string;
   foto: string;
 };
 
@@ -10,13 +10,21 @@ type PetMenuProps = {
   pets: Pet[];
   petSelecionado: number;
   onSelect: (index: number) => void;
+  onAdicionar: () => void;
 };
 
 export default function PetMenu({
   pets,
   petSelecionado,
   onSelect,
+  onAdicionar
 }: PetMenuProps) {
+  function getFotoUrl(foto: string) {
+    return foto.startsWith("http")
+      ? foto
+      : `${process.env.NEXT_PUBLIC_API_URL}${foto}`;
+  }
+
   return (
     <aside className="w-64 shrink-0">
       <div className="bg-white rounded-2xl border border-black/5 shadow-sm p-4">
@@ -32,31 +40,27 @@ export default function PetMenu({
         <div className="space-y-2">
           {pets.map((pet, index) => (
             <button
-              key={pet.username}
+              key={pet.id}
               onClick={() => onSelect(index)}
               className={`w-full flex items-center gap-3 p-3 rounded-xl text-left transition ${petSelecionado === index
-                  ? "bg-[var(--secondary)]/10 border border-[var(--secondary)]/30"
-                  : "hover:bg-gray-50 border border-transparent"
+                ? "bg-[var(--secondary)]/10 border border-[var(--secondary)]/30"
+                : "hover:bg-gray-50 border border-transparent"
                 }`}
             >
               <Image
-                src={pet.foto}
+                src={getFotoUrl(pet.foto)}
                 alt={pet.nome}
                 width={200}
                 height={200}
+                unoptimized
                 className="w-12 h-12 rounded-full object-cover"
               />
 
 
-              <div>
-                <p className="font-semibold text-[var(--secondary)]">
-                  {pet.nome}
-                </p>
+              <p className="font-semibold text-[var(--secondary)]">
+                {pet.nome}
+              </p>
 
-                <p className="text-xs text-gray-500">
-                  {pet.username}
-                </p>
-              </div>
 
               {petSelecionado === index && (
                 <span className="ml-auto text-[var(--secondary)]">
@@ -67,7 +71,7 @@ export default function PetMenu({
           ))}
         </div>
 
-        <button className="w-full mt-4 py-3 rounded-xl border-2 border-dashed border-[var(--primary)]/30 text-[var(--primary)] text-sm font-semibold">
+        <button type="button" onClick={onAdicionar} className="w-full mt-4 py-3 rounded-xl border-2 border-dashed border-[var(--primary)]/30 text-[var(--primary)] text-sm font-semibold">
           + Adicionar pet
         </button>
 

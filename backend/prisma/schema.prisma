@@ -11,44 +11,29 @@ datasource db {
 //tmb roda: npx prisma migrate dev
 
 model Usuario {
-  idUsuario   String   @id @default(uuid())
-  nome        String
-  email       String
-  senha       String
-  dataCriacao DateTime @default(now())
-  pets        Pet[]
 
+  id String @id @default(uuid())
+  nome String
+  email String
+  senha String
   @@map("usuarios")
 }
 
 model Pet {
-  idPet       String       @id @default(uuid())
-  nome        String
-  raca        String
-  tipo_animal String
-  idade       Int
-  localizacao String
-  idUsuario   String
-  usuario     Usuario      @relation(fields: [idUsuario], references: [idUsuario])
-  publicacoes Publicacao[]
 
+  id String @id @default(uuid())
+  nome String
+  raca String
+  tipo_animal String
+  idade Int
+  localizacao String
   @@map("pets")
 }
 
 model Publicacao {
-  idPubli    String       @id @default(uuid())
+
+  id String @id @default(uuid())
   //foto
-  legenda    String
-  idPet      String
-  pet        Pet          @relation(fields: [idPet], references: [idPet])
-  comentario Comentario[]
-
+  legenda String
   @@map("publicacoes")
-}
-
-model Comentario {
-  idComen    String     @id @default(uuid())
-  texto      String
-  idPubli    String
-  publicacao Publicacao @relation(fields: [idPubli], references: [idPubli])
 }
