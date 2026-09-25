@@ -8,6 +8,7 @@ import styles from "./CreatePostBox.module.css";
 
 import { getPets } from "@/api/pets";
 import { createPublicacao } from "@/api/publicacoes";
+import { API_URL } from "@/lib/api";
 
 type Pet = {
     id: string;
@@ -161,9 +162,11 @@ export default function CreatePostBox() {
             ? pets[petSelecionado]?.foto
             : null;
 
-    const fotoPetUrl =
-        fotoPet &&
-        `${process.env.NEXT_PUBLIC_API_URL}${fotoPet}`;
+    const fotoPetUrl = fotoPet
+        ? fotoPet.startsWith("http")
+            ? fotoPet
+            : `${API_URL}${fotoPet}`
+        : null;
 
     return (
         <div className={styles.card}>
@@ -173,11 +176,10 @@ export default function CreatePostBox() {
                     onClick={() =>
                         setPostType("comum")
                     }
-                    className={`${styles.tab} ${
-                        postType === "comum"
+                    className={`${styles.tab} ${postType === "comum"
                             ? styles.activeTab
                             : ""
-                    }`}
+                        }`}
                 >
                     Publicação Comum
                 </button>
@@ -187,11 +189,10 @@ export default function CreatePostBox() {
                     onClick={() =>
                         setPostType("adocao")
                     }
-                    className={`${styles.tab} ${
-                        postType === "adocao"
+                    className={`${styles.tab} ${postType === "adocao"
                             ? styles.activeTab
                             : ""
-                    }`}
+                        }`}
                 >
                     Adoção
                 </button>
@@ -201,11 +202,10 @@ export default function CreatePostBox() {
                     onClick={() =>
                         setPostType("perdidos")
                     }
-                    className={`${styles.tab} ${
-                        postType === "perdidos"
+                    className={`${styles.tab} ${postType === "perdidos"
                             ? styles.activeTab
                             : ""
-                    }`}
+                        }`}
                 >
                     Animal Perdido
                 </button>
@@ -295,8 +295,8 @@ export default function CreatePostBox() {
                                     ? "Conte sobre o pet que procura um lar..."
                                     : postType ===
                                         "perdidos"
-                                      ? "Onde e quando o pet foi visto/se perdeu?"
-                                      : "No que o seu pet está pensando hoje?"
+                                        ? "Onde e quando o pet foi visto/se perdeu?"
+                                        : "No que o seu pet está pensando hoje?"
                             }
                             className={
                                 styles.textarea
