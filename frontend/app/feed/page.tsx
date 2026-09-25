@@ -71,6 +71,7 @@ export default function Feed() {
               <PostCard
                 key={publicacao.id}
                 petName={publicacao.pet.nome}
+                petFoto={publicacao.pet.foto}
                 type={
                   publicacao.tipo === "COMUM"
                     ? "Publicação"
@@ -78,7 +79,11 @@ export default function Feed() {
                       ? "Adoção"
                       : "Animal Perdido"
                 }
-                image={`${process.env.NEXT_PUBLIC_API_URL}${publicacao.foto}`}
+                image={
+                  publicacao.foto.startsWith("http")
+                    ? publicacao.foto
+                    : `${process.env.NEXT_PUBLIC_API_URL}${publicacao.foto}`
+                }
                 caption={publicacao.legenda}
               />
             ))}
