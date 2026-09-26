@@ -1,5 +1,7 @@
 import type { Express, Request, Response } from 'express';
-import { createApp } from '../src/main';
+// A Vercel executa esta função como ESM. Importe o bundle produzido pelo
+// Rspack com a extensão explícita, em vez do código TypeScript fonte.
+import { createApp } from '../dist/main.js';
 
 let server: Express | undefined;
 
