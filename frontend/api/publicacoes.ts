@@ -75,12 +75,36 @@ export type Publicacao = {
   };
 };
 
-export async function getPublicacoes(): Promise<Publicacao[]> {
-  const response = await fetch(`${API_URL}/publicacoes`);
+export async function getPublicacoes(
+  tipo?: Publicacao['tipo'],
+): Promise<Publicacao[]> {
+  const query = tipo ? `?tipo=${tipo}` : '';
+  const response = await fetch(`${API_URL}/publicacoes${query}`);
 
   if (!response.ok) {
     throw new Error("Erro ao carregar publicações.");
   }
 
   return response.json();
+}
+
+export async function getMinhasPublicacoes(): Promise<Publicacao[]> {
+  const token = localStorage.getItem('petbook_token');
+  const response = await fetch(`${API_URL}/publicacoes/minhas`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(
+      Array.isArray(data.message)
+        ? data.message.join(', ')
+        : data.message || 'Erro ao carregar suas publicações.',
+    );
+  }
+
+  return data;
 }

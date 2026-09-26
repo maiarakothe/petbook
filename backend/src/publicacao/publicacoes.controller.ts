@@ -3,6 +3,7 @@ import {
     Controller,
     Post,
     Get,
+    Query,
     Req,
     UploadedFile,
     UseGuards,
@@ -46,8 +47,16 @@ export class PublicacoesController {
         );
     }
 
+    @Get('minhas')
+    @UseGuards(JwtAuthGuard)
+    findMine(@Req() request: any) {
+        return this.publicacoesService.findByUsuario(
+            request.user.sub,
+        );
+    }
+
     @Get()
-    findAll() {
-        return this.publicacoesService.findAll();
+    findAll(@Query('tipo') tipo?: string) {
+        return this.publicacoesService.findAll(tipo);
     }
 }

@@ -43,6 +43,48 @@ export async function createPet(pet: {
   return data;
 }
 
+export async function updatePet(id: string, pet: {
+  nome: string;
+  raca: string;
+  tipo: string;
+  idade: string;
+  localizacao: string;
+  foto: File | null;
+}) {
+  const token = localStorage.getItem('petbook_token');
+  const formData = new FormData();
+
+  formData.append('nome', pet.nome);
+  formData.append('raca', pet.raca);
+  formData.append('tipoAnimal', pet.tipo);
+  formData.append('idade', pet.idade);
+  formData.append('localizacao', pet.localizacao);
+
+  if (pet.foto) {
+    formData.append('foto', pet.foto);
+  }
+
+  const response = await fetch(`${API_URL}/pets/${id}`, {
+    method: 'PATCH',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: formData,
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(
+      Array.isArray(data.message)
+        ? data.message.join(', ')
+        : data.message || 'Erro ao atualizar pet.',
+    );
+  }
+
+  return data;
+}
+
 export async function getPets() {
   const token = localStorage.getItem("petbook_token");
 

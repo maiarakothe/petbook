@@ -185,17 +185,6 @@ export default function LoginPage() {
                 </div>
               )}
 
-              {modo === "login" && (
-                <div className="flex justify-end mt-1">
-                  <button
-                    type="button"
-                    className="text-sm text-[var(--primary)] hover:underline"
-                  >
-                    Esqueci minha senha
-                  </button>
-                </div>
-              )}
-
               {erro && (
                 <p className="text-sm text-red-500">
                   {erro}

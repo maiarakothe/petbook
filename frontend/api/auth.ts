@@ -63,3 +63,17 @@ export async function login(
     }),
   });
 }
+
+export async function updateProfile(
+  usuario: Pick<Usuario, "nome" | "email">,
+) {
+  const token = localStorage.getItem("petbook_token");
+
+  return request<Usuario>("/auth/perfil", {
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(usuario),
+  });
+}

@@ -1,19 +1,21 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import PetMenu from "@/components/Perfil/PetMenu";
 import PetProfile from "@/components/Perfil/PetProfile";
 import UserProfile from "@/components/Perfil/UserProfile";
 import PetDialog from "@/components/Perfil/PetDialog";
 
-import { createPet, getPets } from "@/api/pets";
 
-type Usuario = {
-  id: string;
-  nome: string;
-  email: string;
-};
+import { createPet, getPets, updatePet } from "@/api/pets";
+import { updateProfile, type Usuario } from "@/api/auth";
+import {
+  getMinhasPublicacoes,
+  Publicacao,
+} from "@/api/publicacoes";
+import UserDialog from "@/components/Perfil/UserDialog";
 
 type Pet = {
   id: string;
@@ -21,23 +23,34 @@ type Pet = {
   foto: string;
   raca: string;
   tipo_animal: string;
-  idade: number;
+  idade: string;
   localizacao: string;
   publicacoes?: number;
 };
 
 export default function PerfilPage() {
+  const router = useRouter();
   const [petSelecionado, setPetSelecionado] = useState(0);
   const [dialogPetAberto, setDialogPetAberto] = useState(false);
+  const [dialogUsuarioAberto, setDialogUsuarioAberto] = useState(false);
+  const [petEmEdicao, setPetEmEdicao] = useState<Pet | null>(null);
 
   const [usuario, setUsuario] = useState<Usuario | null>(null);
   const [pets, setPets] = useState<Pet[]>([]);
+  const [publicacoes, setPublicacoes] = useState<Publicacao[]>([]);
 
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState("");
 
   useEffect(() => {
     async function carregarPerfil() {
+      const token = localStorage.getItem("petbook_token");
+
+      if (!token) {
+        router.replace("/login");
+        return;
+      }
+
       try {
         const usuarioSalvo =
           localStorage.getItem("petbook_usuario");
@@ -46,11 +59,21 @@ export default function PerfilPage() {
           setUsuario(JSON.parse(usuarioSalvo));
         }
 
-        const petsData = await getPets();
+        const [petsData, publicacoesData] = await Promise.all([
+          getPets(),
+          getMinhasPublicacoes(),
+        ]);
 
         setPets(petsData);
+        setPublicacoes(publicacoesData);
       } catch (error) {
         if (error instanceof Error) {
+          if (error.message.toLowerCase().includes("token")) {
+            localStorage.removeItem("petbook_token");
+            localStorage.removeItem("petbook_usuario");
+            router.replace("/login");
+            return;
+          }
           setErro(error.message);
         } else {
           setErro("Erro ao carregar perfil.");
@@ -61,7 +84,7 @@ export default function PerfilPage() {
     }
 
     carregarPerfil();
-  }, []);
+  }, [router]);
 
   if (loading) {
     return (
@@ -84,7 +107,30 @@ export default function PerfilPage() {
       <div className="max-w-6xl mx-auto px-6 py-10">
 
         {usuario && (
-          <UserProfile usuario={usuario} />
+          <UserProfile
+            usuario={usuario}
+            quantidadePublicacoes={publicacoes.length}
+            onEditar={() => setDialogUsuarioAberto(true)}
+            onSair={() => {
+              localStorage.removeItem("petbook_token");
+              localStorage.removeItem("petbook_usuario");
+              router.replace("/login");
+            }}
+          />
+        )}
+
+        {usuario && dialogUsuarioAberto && (
+          <UserDialog
+            aberto
+            usuario={usuario}
+            onClose={() => setDialogUsuarioAberto(false)}
+            onSalvar={async (dados: Pick<Usuario, "nome" | "email">) => {
+              const usuarioAtualizado = await updateProfile(dados);
+              localStorage.setItem("petbook_usuario", JSON.stringify(usuarioAtualizado));
+              setUsuario(usuarioAtualizado);
+              setDialogUsuarioAberto(false);
+            }}
+          />
         )}
 
         <div className="flex gap-6">
@@ -93,14 +139,22 @@ export default function PerfilPage() {
             pets={pets}
             petSelecionado={petSelecionado}
             onSelect={setPetSelecionado}
-            onAdicionar={() =>
+            onAdicionar={() => {
+              setPetEmEdicao(null);
               setDialogPetAberto(true)
-            }
+            }}
           />
 
           {pets.length > 0 && (
             <PetProfile
               pet={pets[petSelecionado]}
+              publicacoes={publicacoes.filter(
+                (publicacao) => publicacao.pet.id === pets[petSelecionado].id,
+              )}
+              onEditar={() => {
+                setPetEmEdicao(pets[petSelecionado]);
+                setDialogPetAberto(true);
+              }}
             />
           )}
 
@@ -116,34 +170,45 @@ export default function PerfilPage() {
             </section>
           )}
 
-          <PetDialog
-            aberto={dialogPetAberto}
-            onClose={() =>
-              setDialogPetAberto(false)
-            }
-            onCadastrar={async (pet) => {
-              try {
-                const novoPet = await createPet(pet);
+          {dialogPetAberto && (
+            <PetDialog
+              key={petEmEdicao?.id ?? "novo"}
+              aberto
+              pet={petEmEdicao}
+              onClose={() => setDialogPetAberto(false)}
+              onSalvar={async (pet) => {
+                try {
+                  if (petEmEdicao) {
+                    const petAtualizado = await updatePet(petEmEdicao.id, pet);
+                    setPets((petsAtuais) => petsAtuais.map((petAtual) =>
+                      petAtual.id === petAtualizado.id ? petAtualizado : petAtual,
+                    ));
+                    alert("Pet atualizado com sucesso!");
+                  } else {
+                    const novoPet = await createPet(pet);
 
-                setPets((petsAtuais) => [
-                  ...petsAtuais,
-                  novoPet,
-                ]);
+                    setPets((petsAtuais) => [
+                      ...petsAtuais,
+                      novoPet,
+                    ]);
 
-                setPetSelecionado(pets.length);
+                    setPetSelecionado(pets.length);
 
-                alert("Pet cadastrado com sucesso!");
+                    alert("Pet cadastrado com sucesso!");
+                  }
 
-                setDialogPetAberto(false);
-              } catch (error) {
-                if (error instanceof Error) {
-                  alert(error.message);
-                } else {
-                  alert("Erro ao cadastrar pet.");
+                  setDialogPetAberto(false);
+                  setPetEmEdicao(null);
+                } catch (error) {
+                  if (error instanceof Error) {
+                    alert(error.message);
+                  } else {
+                    alert("Erro ao cadastrar pet.");
+                  }
                 }
-              }
-            }}
-          />
+              }}
+            />
+          )}
 
         </div>
       </div>

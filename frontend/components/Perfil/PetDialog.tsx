@@ -3,31 +3,42 @@
 import { useState } from "react";
 import Image from "next/image";
 
+type PetFormData = {
+    nome: string;
+    raca: string;
+    tipo: string;
+    idade: string;
+    localizacao: string;
+    foto: File | null;
+};
+
 interface PetDialogProps {
     aberto: boolean;
     onClose: () => void;
-    onCadastrar: (pet: {
+    pet?: {
         nome: string;
         raca: string;
-        tipo: string;
-        idade: string;
+        tipo_animal: string;
+        idade: string | number;
         localizacao: string;
-        foto: File | null;
-    }) => Promise<void>;
+        foto: string;
+    } | null;
+    onSalvar: (pet: PetFormData) => Promise<void>;
 }
 
 export default function PetDialog({
     aberto,
     onClose,
-    onCadastrar,
+    pet,
+    onSalvar,
 }: PetDialogProps) {
-    const [nome, setNome] = useState("");
-    const [raca, setRaca] = useState("");
-    const [tipo, setTipo] = useState("");
-    const [idade, setIdade] = useState("");
-    const [localizacao, setLocalizacao] = useState("");
+    const [nome, setNome] = useState(pet?.nome ?? "");
+    const [raca, setRaca] = useState(pet?.raca ?? "");
+    const [tipo, setTipo] = useState(pet?.tipo_animal ?? "");
+    const [idade, setIdade] = useState(pet ? String(pet.idade) : "");
+    const [localizacao, setLocalizacao] = useState(pet?.localizacao ?? "");
     const [foto, setFoto] = useState<File | null>(null);
-    const [fotoPreview, setFotoPreview] = useState("");
+    const [fotoPreview, setFotoPreview] = useState(pet?.foto ?? "");
 
     if (!aberto) {
         return null;
@@ -44,12 +55,12 @@ export default function PetDialog({
         setFotoPreview(URL.createObjectURL(arquivo));
     }
 
-    async function cadastrar() {
-        if (!nome || !tipo || !foto) {
+    async function salvar() {
+        if (!nome || !tipo || (!pet && !foto)) {
             return;
         }
 
-        await onCadastrar({
+        await onSalvar({
             nome,
             raca,
             tipo,
@@ -58,13 +69,6 @@ export default function PetDialog({
             foto,
         });
 
-        setNome("");
-        setRaca("");
-        setTipo("");
-        setIdade("");
-        setLocalizacao("");
-        setFoto(null);
-        setFotoPreview("");
     }
 
     return (
@@ -79,7 +83,7 @@ export default function PetDialog({
                 <div className="mb-6 flex items-start justify-between">
                     <div>
                         <h2 className="text-2xl font-bold text-[var(--secondary)]">
-                            Cadastrar pet
+                            {pet ? "Editar pet" : "Cadastrar pet"}
                         </h2>
 
                         <p className="mt-1 text-sm text-gray-500">
@@ -222,10 +226,10 @@ export default function PetDialog({
 
                     <button
                         type="button"
-                        onClick={cadastrar}
+                        onClick={salvar}
                         className="rounded-xl bg-[var(--primary)] px-5 py-3 font-semibold text-white transition hover:opacity-90"
                     >
-                        Cadastrar pet
+                        {pet ? "Salvar alterações" : "Cadastrar pet"}
                     </button>
                 </div>
             </div>

@@ -87,4 +87,24 @@ export class AuthService {
       },
     };
   }
+
+  async updateProfile(usuarioId: string, dto: { nome: string; email: string }) {
+    try {
+      return await this.prisma.usuario.update({
+        where: { id: usuarioId },
+        data: { nome: dto.nome, email: dto.email },
+        select: { id: true, nome: true, email: true },
+      });
+    } catch (error) {
+      if (
+        typeof error === 'object' &&
+        error !== null &&
+        'code' in error &&
+        error.code === 'P2002'
+      ) {
+        throw new ConflictException('Este email já está cadastrado');
+      }
+      throw error;
+    }
+  }
 }
