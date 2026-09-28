@@ -9,6 +9,7 @@ import { AuthModule } from './auth/auth.module';
 import { PetsModule } from './pets/pets.module';
 import { PublicacoesModule } from './publicacao/publicacoes.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { CurtidaModule } from './curtidas/curtidasModule';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
     PetsModule,
     PublicacoesModule,
     CloudinaryModule,
+    CurtidaModule
   ],
   controllers: [AppController],
   providers: [AppService],

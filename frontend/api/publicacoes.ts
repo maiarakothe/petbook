@@ -63,6 +63,9 @@ export type Publicacao = {
   foto: string;
   legenda: string;
   tipo: "COMUM" | "PERDIDO" | "ADOCAO";
+  _count: {
+    curtidas: number;
+  };
   pet: {
     id: string;
     nome: string;
@@ -104,6 +107,50 @@ export async function getMinhasPublicacoes(): Promise<Publicacao[]> {
         ? data.message.join(', ')
         : data.message || 'Erro ao carregar suas publicações.',
     );
+  }
+
+  return data;
+}
+
+  export async function curtirPublicacao(publicacaoId: string) {
+  const token = localStorage.getItem("petbook_token");
+
+  const response = await fetch(
+    `${API_URL}/publicacoes/${publicacaoId}/curtida`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Erro ao curtir publicação.");
+  }
+
+  return data;
+}
+
+  export async function descurtirPublicacao(publicacaoId: string) {
+  const token = localStorage.getItem("petbook_token");
+
+  const response = await fetch(
+    `${API_URL}/publicacoes/${publicacaoId}/curtida`,
+    {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Erro ao remover curtida.");
   }
 
   return data;

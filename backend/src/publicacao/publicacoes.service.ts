@@ -55,33 +55,43 @@ export class PublicacoesService {
     }
 
     async findAll(tipo?: string) {
-        const tipoPublicacao =
-            tipo === 'ADOCAO' || tipo === 'PERDIDO' || tipo === 'COMUM'
-                ? tipo
-                : undefined;
-
-        return this.prisma.publicacao.findMany({
-            where: tipoPublicacao ? { tipo: tipoPublicacao } : undefined,
+    return this.prisma.publicacao.findMany({
+        where: tipo
+            ? {
+                tipo: tipo as 'COMUM' | 'PERDIDO' | 'ADOCAO',
+            }
+            : undefined,
             include: {
                 pet: true,
                 usuario: true,
+            
+                
+                _count: {
+                    select: {
+                        curtidas: true,
+                    },
+                },
             },
             orderBy: {
-                id: 'desc',
-            },
+                    id: 'desc',
+                },
         });
     }
-
     async findByUsuario(usuarioId: string) {
-        return this.prisma.publicacao.findMany({
-            where: { usuarioId },
-            include: {
-                pet: true,
-                usuario: true,
+    return this.prisma.publicacao.findMany({
+        where: { usuarioId },
+        include: {
+            pet: true,
+            usuario: true,
+            _count: {
+                select: {
+                    curtidas: true,
+                },
             },
-            orderBy: {
-                id: 'desc',
-            },
-        });
-    }
+        },
+        orderBy: {
+            id: 'desc',
+        },
+    });
+}
 }

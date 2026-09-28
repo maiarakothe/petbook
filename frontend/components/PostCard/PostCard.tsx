@@ -4,26 +4,33 @@ import styles from "./PostCard.module.css";
 
 import Image from "next/image";
 
-import { Star, MessageCircle } from "lucide-react";
+import { Star, MessageCircle, Heart } from "lucide-react";
 
 import { useState } from "react";
 
+import { curtirPublicacao, descurtirPublicacao } from "@/api/publicacoes";
+
 interface PostCardProps {
+  id: string;
   petName: string;
   petFoto: string;
   type: string;
   image: string;
   caption: string;
+  likes: number;
 }
 
 export default function PostCard({
+  id,
   petName,
   petFoto,
   type,
   image,
   caption,
+  likes,
 }: PostCardProps) {
   const [curtido, setCurtido] = useState(false);
+  const [favorito, setFavorito] = useState(false);
 
   const tipoClasse =
     type === "Animal Perdido"
@@ -70,14 +77,40 @@ export default function PostCard({
         <p>{caption}</p>
 
         <div className={styles.actions}>
+          
           <button
             type="button"
-            onClick={() => setCurtido(!curtido)}
-            className={curtido ? styles.liked : ""}
+            onClick={async () => {
+              try {
+                if (curtido) {
+                  await descurtirPublicacao(id);
+                } else {
+                  await curtirPublicacao(id);
+                }
+
+                setCurtido(!curtido);
+              } catch (error) {
+                console.error("Erro ao alterar curtida:", error);
+              }
+            }}
+            className={curtido ? styles.curtido : ""}
+          >
+            <Heart
+              size={22}
+              fill={curtido ? "currentColor" : "none"}
+            />
+
+            <span>{likes + (curtido ? 1 : 0)}</span>
+          </button>
+          
+          <button
+            type="button"
+            onClick={() => setFavorito(!favorito)}
+            className={favorito ? styles.favoritado : ""}
           >
             <Star
               size={22}
-              fill={curtido ? "currentColor" : "none"}
+              fill={favorito ? "currentColor" : "none"}
             />
 
             <span>24</span>

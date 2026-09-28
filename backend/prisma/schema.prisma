@@ -1,5 +1,7 @@
 generator client {
   provider = "prisma-client-js"
+  output   = "../generated/prisma"
+  moduleFormat = "cjs"
 }
 
 datasource db {
@@ -7,8 +9,8 @@ datasource db {
 }
 
 
-// Depois de você fazer qualquer alteração nesse arquivo executa: npx prisma generate
-//e: npx prisma migrate dev
+// Depois de você fazer qualquer alteração nesse arquivo executa: npx prisma migrate dev
+//e: npx prisma generate
 
 model Usuario {
 
@@ -19,7 +21,7 @@ model Usuario {
 
   pets Pet[]
   publicacoes Publicacao[]
-  curtida Curtida[]
+  curtidas Curtida[]
 
   @@map("usuarios")
 }
@@ -55,7 +57,7 @@ model Publicacao {
   petId String
   pet Pet @relation(fields: [petId], references: [id])
 
-  curtida Curtida[]
+  curtidas Curtida[]
 
   @@map("publicacoes")
 }

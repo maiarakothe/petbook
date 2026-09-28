@@ -70,6 +70,7 @@ export default function Feed() {
             publicacoes.map((publicacao) => (
               <PostCard
                 key={publicacao.id}
+                id={publicacao.id}
                 petName={publicacao.pet.nome}
                 petFoto={publicacao.pet.foto}
                 type={
@@ -85,6 +86,7 @@ export default function Feed() {
                     : `${process.env.NEXT_PUBLIC_API_URL}${publicacao.foto}`
                 }
                 caption={publicacao.legenda}
+                likes={publicacao._count.curtidas}
               />
             ))}
         </main>
