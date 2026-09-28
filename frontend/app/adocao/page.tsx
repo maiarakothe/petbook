@@ -31,6 +31,7 @@ export default function AdocaoPage() {
         {publicacoes.map((publicacao) => (
           <PostCard
             key={publicacao.id}
+            id={publicacao.id}
             petName={publicacao.pet.nome}
             petFoto={publicacao.pet.foto}
             type="Adoção"
@@ -38,6 +39,7 @@ export default function AdocaoPage() {
               ? publicacao.foto
               : `${process.env.NEXT_PUBLIC_API_URL}${publicacao.foto}`}
             caption={publicacao.legenda}
+            likes={publicacao._count.curtidas}
           />
         ))}
       </section>
