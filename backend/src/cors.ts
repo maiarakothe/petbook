@@ -3,7 +3,8 @@ import type { CorsOptions } from '@nestjs/common/interfaces/external/cors-option
 const LOCALHOST_ORIGIN = /^http:\/\/localhost(?::\d+)?$/;
 const PETBOOK_VERCEL_PREVIEW =
   /^https:\/\/petbook-[a-z0-9-]+-maiarakothes-projects\.vercel\.app$/;
-const PETBOOK_VERCEL_PRODUCTION = /^https:\/\/petbook\.vercel\.app$/;
+const PETBOOK_VERCEL_PRODUCTION =
+  /^https:\/\/petbook(?:-site)?\.vercel\.app$/;
 
 function configuredOrigins(): Set<string> {
   return new Set(
