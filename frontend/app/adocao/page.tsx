@@ -2,11 +2,21 @@
 
 import { useEffect, useState } from "react";
 import PostCard from "@/components/PostCard/PostCard";
+import CreatePostBox from "@/components/CreatePostBox/CreatePostBox";
 import { getPublicacoes, Publicacao } from "@/api/publicacoes";
 
 export default function AdocaoPage() {
   const [publicacoes, setPublicacoes] = useState<Publicacao[]>([]);
   const [erro, setErro] = useState("");
+
+  async function carregarPublicacoes() {
+    try {
+      const dados = await getPublicacoes("ADOCAO");
+      setPublicacoes(dados.filter((publicacao) => publicacao.tipo === "ADOCAO"));
+    } catch (error) {
+      setErro(error instanceof Error ? error.message : "Erro ao carregar adoções.");
+    }
+  }
 
   useEffect(() => {
     getPublicacoes("ADOCAO")
@@ -24,6 +34,7 @@ export default function AdocaoPage() {
         <h1 className="mb-6 text-2xl font-bold text-[var(--secondary)]">
           Adoção
         </h1>
+        <CreatePostBox tipoFixo="adocao" onPublicacaoCriada={carregarPublicacoes} />
         {erro && <p className="text-red-500">{erro}</p>}
         {!erro && publicacoes.length === 0 && (
           <p className="text-gray-500">Nenhum animal para adoção no momento.</p>

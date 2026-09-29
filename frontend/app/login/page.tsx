@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Eye, EyeOff } from "lucide-react";
 
 import { login, register } from "@/api/auth";
 
@@ -15,6 +16,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [confirmarSenha, setConfirmarSenha] = useState("");
+  const [mostrarSenha, setMostrarSenha] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState("");
@@ -156,14 +158,24 @@ export default function LoginPage() {
                   Senha
                 </label>
 
-                <input
-                  type="password"
-                  placeholder="••••••••"
-                  value={senha}
-                  onChange={(e) => setSenha(e.target.value)}
-                  required
-                  className="w-full h-12 px-4 rounded-xl border border-gray-200 outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 transition"
-                />
+                <div className="relative">
+                  <input
+                    type={mostrarSenha ? "text" : "password"}
+                    placeholder="••••••••"
+                    value={senha}
+                    onChange={(e) => setSenha(e.target.value)}
+                    required
+                    className="w-full h-12 px-4 pr-12 rounded-xl border border-gray-200 outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 transition"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setMostrarSenha((visivel) => !visivel)}
+                    aria-label={mostrarSenha ? "Ocultar senha" : "Mostrar senha"}
+                    className="absolute inset-y-0 right-0 flex w-12 items-center justify-center text-gray-500 hover:text-[var(--secondary)]"
+                  >
+                    {mostrarSenha ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </button>
+                </div>
               </div>
 
               {modo === "registro" && (
@@ -173,7 +185,7 @@ export default function LoginPage() {
                   </label>
 
                   <input
-                    type="password"
+                    type={mostrarSenha ? "text" : "password"}
                     placeholder="••••••••"
                     value={confirmarSenha}
                     onChange={(e) =>

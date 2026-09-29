@@ -55,17 +55,23 @@ export class PublicacoesService {
     }
 
     async findAll(tipo?: string) {
-    return this.prisma.publicacao.findMany({
-        where: tipo
-            ? {
-                tipo: tipo as 'COMUM' | 'PERDIDO' | 'ADOCAO',
-            }
-            : undefined,
+        return this.prisma.publicacao.findMany({
+            where: tipo
+                ? {
+                    tipo: tipo as 'COMUM' | 'PERDIDO' | 'ADOCAO',
+                }
+                : undefined,
             include: {
                 pet: true,
-                usuario: true,
-            
-                
+                usuario: {
+                    select: {
+                        id: true,
+                        nome: true,
+                        email: true,
+                    },
+                },
+
+
                 _count: {
                     select: {
                         curtidas: true,
@@ -73,25 +79,31 @@ export class PublicacoesService {
                 },
             },
             orderBy: {
-                    id: 'desc',
-                },
+                id: 'desc',
+            },
         });
     }
     async findByUsuario(usuarioId: string) {
-    return this.prisma.publicacao.findMany({
-        where: { usuarioId },
-        include: {
-            pet: true,
-            usuario: true,
-            _count: {
-                select: {
-                    curtidas: true,
+        return this.prisma.publicacao.findMany({
+            where: { usuarioId },
+            include: {
+                pet: true,
+                usuario: {
+                    select: {
+                        id: true,
+                        nome: true,
+                        email: true,
+                    },
+                },
+                _count: {
+                    select: {
+                        curtidas: true,
+                    },
                 },
             },
-        },
-        orderBy: {
-            id: 'desc',
-        },
-    });
-}
+            orderBy: {
+                id: 'desc',
+            },
+        });
+    }
 }

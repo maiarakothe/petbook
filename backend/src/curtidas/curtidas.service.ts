@@ -30,8 +30,8 @@ export class CurtidaService {
       where: {
         publicacaoId,
       },
-      include: {
-        usuario: true,
+      select: {
+        usuarioId: true,
       },
     });
   }

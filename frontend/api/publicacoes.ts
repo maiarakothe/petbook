@@ -155,3 +155,21 @@ export async function getMinhasPublicacoes(): Promise<Publicacao[]> {
 
   return data;
 }
+
+export type Curtida = {
+  usuarioId: string;
+};
+
+export async function getCurtidasPublicacao(
+  publicacaoId: string,
+): Promise<Curtida[]> {
+  const response = await fetch(
+    `${API_URL}/publicacoes/${publicacaoId}/curtida`,
+  );
+
+  if (!response.ok) {
+    throw new Error("Erro ao carregar curtidas da publicação.");
+  }
+
+  return response.json();
+}

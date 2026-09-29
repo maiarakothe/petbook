@@ -16,9 +16,19 @@ type Pet = {
     foto: string;
 };
 
-export default function CreatePostBox() {
+type TipoPublicacao = "comum" | "adocao" | "perdidos";
+
+type CreatePostBoxProps = {
+    tipoFixo?: Exclude<TipoPublicacao, "comum">;
+    onPublicacaoCriada?: () => void | Promise<void>;
+};
+
+export default function CreatePostBox({
+    tipoFixo,
+    onPublicacaoCriada,
+}: CreatePostBoxProps) {
     const [content, setContent] = useState("");
-    const [postType, setPostType] = useState("comum");
+    const [postType, setPostType] = useState<TipoPublicacao>(tipoFixo ?? "comum");
 
     const [pets, setPets] = useState<Pet[]>([]);
     const [petSelecionado, setPetSelecionado] = useState(0);
@@ -139,6 +149,7 @@ export default function CreatePostBox() {
             setContent("");
             removerImagem();
             setShowEmojiPicker(false);
+            await onPublicacaoCriada?.();
         } catch (error) {
             console.error(
                 "Erro ao criar publicação:",
@@ -170,6 +181,11 @@ export default function CreatePostBox() {
 
     return (
         <div className={styles.card}>
+            {tipoFixo ? (
+                <div className={styles.fixedType}>
+                    {tipoFixo === "adocao" ? "Publicação para adoção" : "Publicação de animal perdido"}
+                </div>
+            ) : (
             <div className={styles.tabs}>
                 <button
                     type="button"
@@ -210,6 +226,7 @@ export default function CreatePostBox() {
                     Animal Perdido
                 </button>
             </div>
+            )}
 
             <form onSubmit={handlePostSubmit}>
                 <div className={styles.formContent}>

@@ -93,9 +93,6 @@ export default function PetProfile({ pet, publicacoes, onEditar }: PetProfilePro
               Publicações de {pet.nome}
             </h2>
 
-            <button className="px-4 py-2 rounded-xl bg-[var(--primary)] text-white text-sm font-semibold">
-              + Publicar
-            </button>
           </div>
 
           {publicacoes.length === 0 ? (
