@@ -17,7 +17,7 @@ export default function UserProfile({
     onSair,
 }: UserProfileProps) {
     return (
-        <div className="mb-8 flex items-center justify-between">
+        <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
                 <p className="text-sm text-gray-500">
                     Conta
@@ -33,25 +33,19 @@ export default function UserProfile({
 
             </div>
 
-            <button
-                type="button"
-                onClick={onEditar}
-                className="px-4 py-2 rounded-xl bg-white border border-black/10
+            <div className="flex gap-2">
+              <button type="button" onClick={onEditar} className="flex-1 px-4 py-2 rounded-xl bg-white border border-black/10
                        text-sm font-semibold
                        hover:border-[var(--primary)]
                        hover:text-[var(--primary)]
-                       transition"
-            >
+                       transition">
                 Editar informações
-            </button>
+              </button>
 
-            <button
-                type="button"
-                onClick={onSair}
-                className="ml-3 px-4 py-2 rounded-xl border border-red-200 text-sm font-semibold text-red-700 transition hover:bg-red-50"
-            >
+              <button type="button" onClick={onSair} className="px-4 py-2 rounded-xl border border-red-200 text-sm font-semibold text-red-700 transition hover:bg-red-50">
                 Sair
-            </button>
+              </button>
+            </div>
         </div>
     );
 }

@@ -9,13 +9,16 @@ import UserProfile from "@/components/Perfil/UserProfile";
 import PetDialog from "@/components/Perfil/PetDialog";
 
 
-import { createPet, getPets, updatePet } from "@/api/pets";
+import { createPet, deletePet, getPets, updatePet } from "@/api/pets";
 import { updateProfile, type Usuario } from "@/api/auth";
 import {
   getMinhasPublicacoes,
+  deletePublicacao,
+  updatePublicacao,
   Publicacao,
 } from "@/api/publicacoes";
 import UserDialog from "@/components/Perfil/UserDialog";
+import PostDialog from "@/components/Perfil/PostDialog";
 
 type Pet = {
   id: string;
@@ -34,6 +37,7 @@ export default function PerfilPage() {
   const [dialogPetAberto, setDialogPetAberto] = useState(false);
   const [dialogUsuarioAberto, setDialogUsuarioAberto] = useState(false);
   const [petEmEdicao, setPetEmEdicao] = useState<Pet | null>(null);
+  const [publicacaoEmEdicao, setPublicacaoEmEdicao] = useState<Publicacao | null>(null);
 
   const [usuario, setUsuario] = useState<Usuario | null>(null);
   const [pets, setPets] = useState<Pet[]>([]);
@@ -104,7 +108,7 @@ export default function PerfilPage() {
 
   return (
     <main className="min-h-screen bg-[var(--background)]">
-      <div className="max-w-6xl mx-auto px-6 py-10">
+      <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-10">
 
         {usuario && (
           <UserProfile
@@ -133,7 +137,7 @@ export default function PerfilPage() {
           />
         )}
 
-        <div className="flex gap-6">
+        <div className="flex flex-col gap-6 lg:flex-row">
 
           <PetMenu
             pets={pets}
@@ -154,6 +158,24 @@ export default function PerfilPage() {
               onEditar={() => {
                 setPetEmEdicao(pets[petSelecionado]);
                 setDialogPetAberto(true);
+              }}
+              onExcluir={async () => {
+                if (!confirm(`Excluir ${pets[petSelecionado].nome} e todas as suas publicações?`)) return;
+                try {
+                  const id = pets[petSelecionado].id;
+                  await deletePet(id);
+                  setPets((atuais) => atuais.filter((pet) => pet.id !== id));
+                  setPublicacoes((atuais) => atuais.filter((publicacao) => publicacao.pet.id !== id));
+                  setPetSelecionado(0);
+                } catch (error) { alert(error instanceof Error ? error.message : "Erro ao excluir pet."); }
+              }}
+              onEditarPublicacao={setPublicacaoEmEdicao}
+              onExcluirPublicacao={async (publicacao) => {
+                if (!confirm("Excluir esta publicação?")) return;
+                try {
+                  await deletePublicacao(publicacao.id);
+                  setPublicacoes((atuais) => atuais.filter((item) => item.id !== publicacao.id));
+                } catch (error) { alert(error instanceof Error ? error.message : "Erro ao excluir publicação."); }
               }}
             />
           )}
@@ -208,6 +230,16 @@ export default function PerfilPage() {
                 }
               }}
             />
+          )}
+
+          {publicacaoEmEdicao && (
+            <PostDialog publicacao={publicacaoEmEdicao} onClose={() => setPublicacaoEmEdicao(null)} onSalvar={async (dados) => {
+              try {
+                const atualizada = await updatePublicacao(publicacaoEmEdicao.id, dados);
+                setPublicacoes((atuais) => atuais.map((item) => item.id === atualizada.id ? { ...item, ...atualizada } : item));
+                setPublicacaoEmEdicao(null);
+              } catch (error) { alert(error instanceof Error ? error.message : "Erro ao atualizar publicação."); }
+            }} />
           )}
 
         </div>

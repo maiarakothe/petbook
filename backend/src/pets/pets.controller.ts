@@ -3,6 +3,9 @@ import {
   Controller,
   Get,
   Post,
+  Patch,
+  Delete,
+  Param,
   Req,
   UploadedFile,
   UseGuards,
@@ -52,5 +55,27 @@ export class PetsController {
     const usuarioId = request.user.sub;
 
     return this.petsService.findAll(usuarioId);
+  }
+
+  @Patch(':id')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(
+    FileInterceptor('foto', {
+      storage: memoryStorage(),
+    }),
+  )
+  update(
+    @Param('id') id: string,
+    @Body() dto: Partial<CreatePetDto>,
+    @UploadedFile() foto: Express.Multer.File | undefined,
+    @Req() request: any,
+  ) {
+    return this.petsService.update(id, request.user.sub, dto, foto);
+  }
+
+  @Delete(':id')
+  @UseGuards(JwtAuthGuard)
+  remove(@Param('id') id: string, @Req() request: any) {
+    return this.petsService.remove(id, request.user.sub);
   }
 }

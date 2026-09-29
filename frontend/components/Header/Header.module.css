@@ -41,3 +41,39 @@
   font-weight: 600;
   background-color: var(--primary);
 }
+
+@media (max-width: 640px) {
+  .header {
+    height: 64px;
+    padding: 0 14px;
+  }
+
+  .logo img {
+    width: 124px;
+    height: auto;
+  }
+
+  .nav {
+    position: fixed;
+    z-index: 40;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    justify-content: space-around;
+    gap: 0;
+    padding: 7px 8px calc(7px + env(safe-area-inset-bottom));
+    background: white;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.06);
+  }
+
+  .link {
+    min-width: 58px;
+    flex-direction: column;
+    gap: 2px;
+    padding: 5px 7px;
+    font-size: 10px;
+  }
+
+  .link svg { width: 19px; height: 19px; }
+}

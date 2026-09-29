@@ -107,3 +107,16 @@ export async function getPets() {
 
   return data;
 }
+
+export async function deletePet(id: string): Promise<void> {
+  const token = localStorage.getItem('petbook_token');
+  const response = await fetch(`${API_URL}/pets/${id}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  if (!response.ok) {
+    const data = await response.json();
+    throw new Error(data.message || 'Erro ao excluir pet.');
+  }
+}

@@ -78,4 +78,28 @@ export class PetsService {
       },
     });
   }
+
+  async remove(id: string, usuarioId: string) {
+    const pet = await this.prisma.pet.findFirst({
+      where: { id, usuarioId },
+    });
+
+    if (!pet) {
+      throw new NotFoundException('Pet não encontrado.');
+    }
+
+    const publicacoes = await this.prisma.publicacao.findMany({
+      where: { petId: id },
+      select: { id: true },
+    });
+    const publicacaoIds = publicacoes.map((publicacao) => publicacao.id);
+
+    await this.prisma.$transaction([
+      this.prisma.curtida.deleteMany({
+        where: { publicacaoId: { in: publicacaoIds } },
+      }),
+      this.prisma.publicacao.deleteMany({ where: { petId: id } }),
+      this.prisma.pet.delete({ where: { id } }),
+    ]);
+  }
 }

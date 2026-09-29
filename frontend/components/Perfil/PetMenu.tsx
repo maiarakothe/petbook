@@ -26,7 +26,7 @@ export default function PetMenu({
   }
 
   return (
-    <aside className="w-64 shrink-0">
+    <aside className="w-full shrink-0 lg:w-64">
       <div className="bg-white rounded-2xl border border-black/5 shadow-sm p-4">
 
         <h2 className="font-bold text-[var(--secondary)] mb-1">
@@ -37,12 +37,12 @@ export default function PetMenu({
           Selecione um animal
         </p>
 
-        <div className="space-y-2">
+        <div className="flex gap-2 overflow-x-auto pb-1 lg:block lg:space-y-2 lg:overflow-visible lg:pb-0">
           {pets.map((pet, index) => (
             <button
               key={pet.id}
               onClick={() => onSelect(index)}
-              className={`w-full flex items-center gap-3 p-3 rounded-xl text-left transition ${petSelecionado === index
+              className={`min-w-40 flex items-center gap-3 p-3 rounded-xl text-left transition lg:w-full ${petSelecionado === index
                 ? "bg-[var(--secondary)]/10 border border-[var(--secondary)]/30"
                 : "hover:bg-gray-50 border border-transparent"
                 }`}

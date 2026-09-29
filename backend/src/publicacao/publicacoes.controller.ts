@@ -3,6 +3,7 @@ import {
     Param,
     Controller,
     Post,
+    Patch,
     Get,
     Delete,
     Query,
@@ -49,6 +50,36 @@ export class PublicacoesController {
             usuarioId,
             foto,
         );
+    }
+
+    @Patch(':publicacaoId')
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(
+        FileInterceptor('foto', {
+            storage: memoryStorage(),
+        }),
+    )
+    update(
+        @Param('publicacaoId') publicacaoId: string,
+        @Body() dto: Partial<CreatePublicacaoDto>,
+        @UploadedFile() foto: Express.Multer.File | undefined,
+        @Req() request: any,
+    ) {
+        return this.publicacoesService.update(
+            publicacaoId,
+            request.user.sub,
+            dto,
+            foto,
+        );
+    }
+
+    @Delete(':publicacaoId')
+    @UseGuards(JwtAuthGuard)
+    remove(
+        @Param('publicacaoId') publicacaoId: string,
+        @Req() request: any,
+    ) {
+        return this.publicacoesService.remove(publicacaoId, request.user.sub);
     }
 
     @Get('minhas')

@@ -112,6 +112,38 @@ export async function getMinhasPublicacoes(): Promise<Publicacao[]> {
   return data;
 }
 
+export async function updatePublicacao(
+  id: string,
+  publicacao: { legenda: string; tipo: string; foto?: File | null },
+): Promise<Publicacao> {
+  const token = localStorage.getItem('petbook_token');
+  const formData = new FormData();
+  formData.append('legenda', publicacao.legenda);
+  formData.append('tipo', publicacao.tipo);
+  if (publicacao.foto) formData.append('foto', publicacao.foto);
+
+  const response = await fetch(`${API_URL}/publicacoes/${id}`, {
+    method: 'PATCH',
+    headers: { Authorization: `Bearer ${token}` },
+    body: formData,
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || 'Erro ao atualizar publicação.');
+  return data;
+}
+
+export async function deletePublicacao(id: string): Promise<void> {
+  const token = localStorage.getItem('petbook_token');
+  const response = await fetch(`${API_URL}/publicacoes/${id}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!response.ok) {
+    const data = await response.json();
+    throw new Error(data.message || 'Erro ao excluir publicação.');
+  }
+}
+
   export async function curtirPublicacao(publicacaoId: string) {
   const token = localStorage.getItem("petbook_token");
 

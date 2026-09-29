@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import { CreatePublicacaoDto } from './dto/create-publicacao.dto';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
@@ -82,6 +82,57 @@ export class PublicacoesService {
                 id: 'desc',
             },
         });
+    }
+
+    async update(
+        id: string,
+        usuarioId: string,
+        dto: Partial<CreatePublicacaoDto>,
+        foto?: Express.Multer.File,
+    ) {
+        const publicacao = await this.prisma.publicacao.findFirst({
+            where: { id, usuarioId },
+        });
+
+        if (!publicacao) {
+            throw new NotFoundException('Publicação não encontrada.');
+        }
+
+        const fotoUrl = foto
+            ? await this.cloudinaryService.uploadImage(foto, 'petbook/publicacoes')
+            : undefined;
+
+        const tipo = dto.tipo
+            ? dto.tipo === 'adocao'
+                ? 'ADOCAO'
+                : dto.tipo === 'perdidos'
+                    ? 'PERDIDO'
+                    : 'COMUM'
+            : undefined;
+
+        return this.prisma.publicacao.update({
+            where: { id },
+            data: {
+                ...(dto.legenda !== undefined && { legenda: dto.legenda }),
+                ...(tipo !== undefined && { tipo }),
+                ...(fotoUrl !== undefined && { foto: fotoUrl }),
+            },
+        });
+    }
+
+    async remove(id: string, usuarioId: string) {
+        const publicacao = await this.prisma.publicacao.findFirst({
+            where: { id, usuarioId },
+        });
+
+        if (!publicacao) {
+            throw new NotFoundException('Publicação não encontrada.');
+        }
+
+        await this.prisma.$transaction([
+            this.prisma.curtida.deleteMany({ where: { publicacaoId: id } }),
+            this.prisma.publicacao.delete({ where: { id } }),
+        ]);
     }
     async findByUsuario(usuarioId: string) {
         return this.prisma.publicacao.findMany({
