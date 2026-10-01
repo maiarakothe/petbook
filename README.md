@@ -1,124 +1,304 @@
-# 🐾 PETBOOK
+# 🐾 PetBook
 
-O **PetBook** é uma rede social voltada para animais de estimação, inspirada em plataformas como o Instagram. A proposta é permitir que os usuários criem perfis para seus pets, compartilhem publicações, interajam com outros usuários e encontrem animais para adoção, animais perdidos e eventos.
+O PetBook é uma aplicação full stack para conectar tutores de pets, compartilhar momentos, divulgar animais para adoção e acompanhar publicações relacionadas a pets perdidos, achados e rotina de convivência.
 
-## 📋 Requisitos / marcado como concluida porque foi realizada no front, falta o backend
-
-### 🔐 Autenticação e usuários
-
-- [x] Cadastro de usuário com nome, email e senha
-- [x] Login utilizando e-mail e senha.
-- [ ] ***Regra*** Apenas usuários cadastrados podem realizar publicações, curtidas, comentários e seguir outros perfis.
-
-### 🐶 Perfil do pet
-
-- [x] Cadastrar um ou mais pets com, Nome, Foto, Raça, Tipo de animal, Idade, Localização
-- [x] Exibir informações do usuário responsável
-- [x] Exibir os pets cadastrados pelo usuário
-- [x] Permitir alternar entre os pets
-
-### 📸 Publicações
-
-- [X] Criar publicação com Foto, Legenda e Emojis
-- [x] Identificação do tipo de publicação:
-  - [x] Publicação comum
-  - [x] Animal perdido
-  - [x] Animal para adoção
-- [x] Na publicação adicionar opção de poder escolher qual pet vai estar fazendo a publicação
-
-### ❤️ Interações
-
-- [ ] Curtir publicações
-- [ ] Comentar publicações
-- [ ] Seguir outros perfis **- sem prioridade**
-- [ ] Visualizar os perfis que seguem e que são seguidos pelo usuário **- sem prioridade**
-
-### 🏠 Adoção de animais
-
-- [ ] Aba com o tipo de postagem "adoção", exibir animais disponíveis para adoção
-- [ ] Filtros **- sem prioridade**
-
-### 🔎 Animais perdidos
-
-- [ ] Aba com o tipo de postagem "animal perdido", exibir animais perdidos
-- [ ] Filtros **- sem prioridade**
-
-### 📅 Encontros de animais **- sem prioridade**
-
-Os usuários poderão divulgar e encontrar eventos relacionados a animais.
-
-Exemplo: _"Encontro de Golden Retrievers no domingo, no Shopping X."_
-
-- [ ] Criar publicação de encontro/evento
-- [ ] Informar data, Informar horário, Informar local, Adicionar descrição do evento
-- [ ] Visualizar encontros publicados
-- [ ] Confirmar presença no encontro
-- [ ] Visualizar quantidade de pessoas confirmadas
+A proposta da plataforma é unir um feed social com um perfil de pet, permitindo que o usuário gerencie seus animais, publique conteúdos, interaja com o feed e acompanhe o engajamento com curtidas em publicações.
 
 ---
 
-## 🚀 Tecnologias
+## ✨ Funcionalidades
 
-### Frontend
+### Autenticação e usuários
 
-Next.js
+- Cadastro de usuário com nome, email e senha
+- Login com autenticação JWT
+- Recuperação do usuário autenticado no backend
+- Atualização do perfil do usuário
+- Senhas protegidas com hash antes da persistência
 
-### Backend
+### Perfil do pet
 
-NestJS
+- Cadastro de pets com nome, foto, raça, tipo, idade e localização
+- Listagem de pets do usuário logado
+- Edição e exclusão de pets
+- Alternância entre pets no perfil e nas publicações
 
-### ORM
+### Publicações
 
-Prisma
+- Criação de publicações com foto e legenda
+- Tipos de publicação:
+  - COMUM
+  - PERDIDO
+  - ADOCAO
+- Associação da publicação com um pet específico
+- Listagem de publicações gerais e por usuário
+- Upload de imagem para armazenamento em Cloudinary
 
-### Banco de dados
+### Interações
 
-PostgreSQL
+- Curtida em publicações
+- Listagem das curtidas por publicação
+- Feed de publicações com filtros por tipo
+
+### Arquitetura e stack
+
+- Frontend em Next.js + React + TypeScript
+- Backend em NestJS + TypeScript
+- ORM Prisma com PostgreSQL
+- Upload de imagens via Cloudinary
+- Autenticação JWT com guarda de rotas
 
 ---
-# ▶️ Como executar o Frontend
 
-## Pré-requisitos
+## 🏗️ Arquitetura da aplicação
 
-Antes de executar o projeto, é necessário ter instalado:
+A aplicação está organizada em dois projetos independentes, mas conectados:
 
-- Node.js
+- Frontend: responsável pela interface, autenticação do usuário, feed, perfis e interações visuais
+- Backend: responsável pela regra de negócio, autenticação, persistência, uploads e autorização
+
+### Stack principal
+
+#### Frontend
+
+- Next.js 16
+- React 19
+- TypeScript
+- Tailwind CSS
+
+#### Backend
+
+- NestJS
+- Prisma ORM
+- PostgreSQL
+- JWT
+- bcrypt
+- Cloudinary
+
+---
+
+## 📁 Estrutura do projeto
+
+```bash
+petbook/
+├── backend/
+│   ├── prisma/
+│   │   └── schema.prisma
+│   ├── src/
+│   │   ├── app.controller.ts
+│   │   ├── app.module.ts
+│   │   ├── auth/
+│   │   ├── cloudinary/
+│   │   ├── curtidas/
+│   │   ├── database/
+│   │   ├── pets/
+│   │   ├── publicacao/
+│   │   └── usuarios/
+│   ├── .env.example
+│   ├── package.json
+│   └── README.md
+├── frontend/
+│   ├── app/
+│   ├── api/
+│   ├── components/
+│   ├── lib/
+│   ├── package.json
+│   └── .env.local
+├── README.md
+└── package.json (se houver no nível raiz)
+```
+
+---
+
+## 🧩 Modelo de dados
+
+O banco principal é estruturado em torno de quatro entidades principais:
+
+- Usuario
+  - id
+  - nome
+  - email
+  - senha
+
+- Pet
+  - id
+  - nome
+  - foto
+  - raca
+  - tipo_animal
+  - idade
+  - localizacao
+  - usuarioId
+
+- Publicacao
+  - id
+  - foto
+  - legenda
+  - tipo
+  - usuarioId
+  - petId
+
+- Curtida
+  - id
+  - usuarioId
+  - publicacaoId
+
+Além disso, a enumeração `TipoPublicacao` define o tipo da publicação:
+
+- COMUM
+- PERDIDO
+- ADOCAO
+
+---
+
+## ⚙️ Pré-requisitos
+
+Antes de rodar o projeto, certifique-se de ter instalado:
+
+- Node.js 22.12+ ou superior
 - npm
+- PostgreSQL 16+
 - Git
+- Conta no Cloudinary para upload de imagens
 
-## 1. Clonar o repositório
+---
+
+## 🚀 Configuração local
+
+### 1. Clone o repositório
 
 ```bash
 git clone https://github.com/maiarakothe/petbook.git
-```
-
-Depois, entre na pasta do projeto:
-```bash
 cd petbook
 ```
-Entre na pasta do frontend
+
+### 2. Instale as dependências do backend
+
 ```bash
-cd frontend
-```
-Instalar as dependências
-```bash
+cd backend
 npm install
 ```
 
-Executar o projeto
+### 3. Configure as variáveis de ambiente do backend
+
+Crie um arquivo `.env` com base no exemplo:
+
 ```bash
+cp .env.example .env
+```
+
+Exemplo de conteúdo:
+
+```env
+DATABASE_URL="postgresql://postgres:senha_do_banco@localhost:5432/petbook"
+FRONTEND_ORIGINS="http://localhost:3000"
+PORT=3001
+JWT_SECRET=petbook-secret
+CORS_ORIGINS=http://localhost:3000
+CLOUDINARY_CLOUD_NAME=seu_cloud_name
+CLOUDINARY_API_KEY=sua_api_key
+CLOUDINARY_API_SECRET=sua_api_secret
+```
+
+### 4. Configure o frontend
+
+No diretório do frontend, crie ou ajuste o arquivo `.env.local`:
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:3001
+```
+
+---
+
+## 🗄️ Banco de dados
+
+No backend, gere o Prisma Client e aplique as migrações:
+
+```bash
+cd backend
+npx prisma generate
+npx prisma migrate dev
+```
+
+Se o banco ainda não existir, ele será criado conforme a configuração do `DATABASE_URL`.
+
+---
+
+## ▶️ Como executar a aplicação
+
+### Backend
+
+```bash
+cd backend
+npm run start:dev
+```
+
+O backend fica disponível em:
+
+```bash
+http://localhost:3001
+```
+
+### Frontend
+
+Em outro terminal:
+
+```bash
+cd frontend
+npm install
 npm run dev
 ```
 
-Entre na pasta do backend
+O frontend fica disponível em:
+
 ```bash
-cd backend
+http://localhost:3000
 ```
 
-Executar o backend
-```bash
-npm run start
-```
+---
+
+## 📡 Endpoints principais
+
+### Autenticação
+
+- `POST /auth/register` — cadastro de usuário
+- `POST /auth/login` — login do usuário
+- `PATCH /auth/perfil` — atualização do perfil do usuário autenticado
+
+### Pets
+
+- `POST /pets` — cria um pet
+- `GET /pets` — lista os pets do usuário autenticado
+- `PATCH /pets/:id` — atualiza um pet
+- `DELETE /pets/:id` — remove um pet
+
+### Publicações
+
+- `POST /publicacoes` — cria uma publicação
+- `GET /publicacoes` — lista as publicações
+- `GET /publicacoes/minhas` — lista as publicações do usuário autenticado
+- `PATCH /publicacoes/:publicacaoId` — atualiza uma publicação
+- `DELETE /publicacoes/:publicacaoId` — remove uma publicação
+
+### Curtidas
+
+- `POST /publicacoes/:publicacaoId/curtida` — curtir publicação
+- `DELETE /publicacoes/:publicacaoId/curtida` — remover curtida
+- `GET /publicacoes/:publicacaoId/curtida` — listar curtidas
+
+> As rotas de criação, edição e listagem de dados sensíveis ficam protegidas por `JwtAuthGuard`.
+
+---
+
+## 🔐 Segurança
+
+- Senhas armazenadas com hash usando bcrypt
+- Tokens JWT para autenticação do usuário
+- Guarda de rotas no backend para proteger endpoints sensíveis
+- Validação dos dados recebidos no backend
+- Upload de mídia em serviço externo (Cloudinary)
+
+---
 
 ## 👨‍💻 Desenvolvedores
 
@@ -126,13 +306,13 @@ npm run start
   <tr>
     <td align="center">
       <a href="https://github.com/maiarakothe" style="text-decoration: none; color: inherit;">
-        <img src="https://avatars.githubusercontent.com/u/160647563?v=4" width="115"><br>
+        <img src="https://avatars.githubusercontent.com/u/160647563?v=4" width="120" alt="Maiara Braun Kothe"><br>
         <strong>Maiara Braun Kothe</strong>
       </a>
     </td>
     <td align="center">
       <a href="https://github.com/MatheusBamberg" style="text-decoration: none; color: inherit;">
-        <img src="https://avatars.githubusercontent.com/u/204625992?v=4" width="115"><br>
+        <img src="https://avatars.githubusercontent.com/u/204625992?v=4" width="120" alt="Matheus Scherer Bamberg"><br>
         <strong>Matheus Scherer Bamberg</strong>
       </a>
     </td>
