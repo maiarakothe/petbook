@@ -10,6 +10,7 @@ import { PetsModule } from './pets/pets.module';
 import { PublicacoesModule } from './publicacao/publicacoes.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { CurtidaModule } from './curtidas/curtidasModule';
+import { ComentariosModule } from './comentarios/comentarios.module';
 
 @Module({
   imports: [
@@ -22,7 +23,8 @@ import { CurtidaModule } from './curtidas/curtidasModule';
     PetsModule,
     PublicacoesModule,
     CloudinaryModule,
-    CurtidaModule
+    CurtidaModule,
+    ComentariosModule,
   ],
   controllers: [AppController],
   providers: [AppService],

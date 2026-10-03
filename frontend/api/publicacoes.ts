@@ -65,6 +65,7 @@ export type Publicacao = {
   tipo: "COMUM" | "PERDIDO" | "ADOCAO";
   _count: {
     curtidas: number;
+    comentarios: number;
   };
   pet: {
     id: string;
@@ -204,4 +205,96 @@ export async function getCurtidasPublicacao(
   }
 
   return response.json();
+}
+
+export type Comentario = {
+  id: string;
+  texto: string;
+  criadoEm: string;
+  atualizadoEm: string;
+  usuario: {
+    id: string;
+    nome: string;
+  };
+};
+
+async function requestComentarios<T>(
+  publicacaoId: string,
+  path = "",
+  options: RequestInit = {},
+): Promise<T> {
+  const token = localStorage.getItem("petbook_token");
+  const response = await fetch(
+    `${API_URL}/publicacoes/${encodeURIComponent(publicacaoId)}/comentarios${path}`,
+    {
+      ...options,
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(options.body ? { "Content-Type": "application/json" } : {}),
+      },
+    },
+  );
+
+  const responseText = await response.text();
+  if (!responseText) {
+    if (!response.ok) {
+      throw new Error("Não foi possível concluir a operação de comentário.");
+    }
+    return undefined as T;
+  }
+
+  const data = JSON.parse(responseText) as {
+    message?: string | string[];
+  } & T;
+  if (!response.ok) {
+    throw new Error(
+      Array.isArray(data.message)
+        ? data.message.join(", ")
+        : data.message || "Não foi possível concluir a operação de comentário.",
+    );
+  }
+
+  return data;
+}
+
+export function getComentarios(
+  publicacaoId: string,
+): Promise<Comentario[]> {
+  return requestComentarios<Comentario[]>(publicacaoId);
+}
+
+export function criarComentario(
+  publicacaoId: string,
+  texto: string,
+): Promise<Comentario> {
+  return requestComentarios<Comentario>(publicacaoId, "", {
+    method: "POST",
+    body: JSON.stringify({ texto }),
+  });
+}
+
+export function atualizarComentario(
+  publicacaoId: string,
+  comentarioId: string,
+  texto: string,
+): Promise<Comentario> {
+  return requestComentarios<Comentario>(
+    publicacaoId,
+    `/${encodeURIComponent(comentarioId)}`,
+    {
+      method: "PATCH",
+      body: JSON.stringify({ texto }),
+    },
+  );
+}
+
+export function excluirComentario(
+  publicacaoId: string,
+  comentarioId: string,
+): Promise<void> {
+  return requestComentarios<void>(
+    publicacaoId,
+    `/${encodeURIComponent(comentarioId)}`,
+    { method: "DELETE" },
+  );
 }

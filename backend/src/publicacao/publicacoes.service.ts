@@ -75,6 +75,7 @@ export class PublicacoesService {
                 _count: {
                     select: {
                         curtidas: true,
+                        comentarios: true,
                     },
                 },
             },
@@ -131,6 +132,7 @@ export class PublicacoesService {
 
         await this.prisma.$transaction([
             this.prisma.curtida.deleteMany({ where: { publicacaoId: id } }),
+            this.prisma.comentario.deleteMany({ where: { publicacaoId: id } }),
             this.prisma.publicacao.delete({ where: { id } }),
         ]);
     }
@@ -149,6 +151,7 @@ export class PublicacoesService {
                 _count: {
                     select: {
                         curtidas: true,
+                        comentarios: true,
                     },
                 },
             },

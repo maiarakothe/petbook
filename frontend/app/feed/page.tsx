@@ -87,6 +87,7 @@ export default function Feed() {
                 }
                 caption={publicacao.legenda}
                 likes={publicacao._count.curtidas}
+                commentCount={publicacao._count.comentarios}
               />
             ))}
         </main>

@@ -51,6 +51,7 @@ export default function PerdidosPage() {
               : `${process.env.NEXT_PUBLIC_API_URL}${publicacao.foto}`}
             caption={publicacao.legenda}
             likes={publicacao._count.curtidas}
+            commentCount={publicacao._count.comentarios}
           />
         ))}
       </section>

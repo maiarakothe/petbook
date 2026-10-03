@@ -112,7 +112,7 @@ petbook/
 
 ## 🧩 Modelo de dados
 
-O banco principal é estruturado em torno de quatro entidades principais:
+O banco principal é estruturado em torno de cinco entidades principais:
 
 - Usuario
   - id
@@ -142,6 +142,14 @@ O banco principal é estruturado em torno de quatro entidades principais:
   - id
   - usuarioId
   - publicacaoId
+
+- Comentario
+  - id
+  - texto
+  - usuarioId
+  - publicacaoId
+  - criadoEm
+  - atualizadoEm
 
 Além disso, a enumeração `TipoPublicacao` define o tipo da publicação:
 
@@ -285,6 +293,15 @@ http://localhost:3000
 - `POST /publicacoes/:publicacaoId/curtida` — curtir publicação
 - `DELETE /publicacoes/:publicacaoId/curtida` — remover curtida
 - `GET /publicacoes/:publicacaoId/curtida` — listar curtidas
+
+### Comentários
+
+- `GET /publicacoes/:publicacaoId/comentarios` — listar comentários da publicação
+- `POST /publicacoes/:publicacaoId/comentarios` — criar comentário (`texto`, autenticado)
+- `PATCH /publicacoes/:publicacaoId/comentarios/:comentarioId` — editar comentário próprio (`texto`, autenticado)
+- `DELETE /publicacoes/:publicacaoId/comentarios/:comentarioId` — excluir comentário próprio (autenticado)
+
+Comentários devem conter entre 1 e 1000 caracteres. A leitura é pública; criação, edição e exclusão exigem token JWT e somente o autor pode editar ou excluir seu comentário.
 
 > As rotas de criação, edição e listagem de dados sensíveis ficam protegidas por `JwtAuthGuard`.
 

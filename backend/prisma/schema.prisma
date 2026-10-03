@@ -22,6 +22,7 @@ model Usuario {
   pets Pet[]
   publicacoes Publicacao[]
   curtidas Curtida[]
+  comentarios Comentario[]
 
   @@map("usuarios")
 }
@@ -58,6 +59,7 @@ model Publicacao {
   pet Pet @relation(fields: [petId], references: [id])
 
   curtidas Curtida[]
+  comentarios Comentario[]
 
   @@map("publicacoes")
 }
@@ -74,6 +76,22 @@ model Curtida {
   @@unique([usuarioId, publicacaoId])
 
   @@map("curtidas")
+}
+
+model Comentario {
+  id String @id @default(uuid())
+  texto String
+  criadoEm DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+
+  usuarioId String
+  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  publicacaoId String
+  publicacao Publicacao @relation(fields: [publicacaoId], references: [id], onDelete: Cascade)
+
+  @@index([publicacaoId, criadoEm])
+  @@map("comentarios")
 }
 
 enum TipoPublicacao {
