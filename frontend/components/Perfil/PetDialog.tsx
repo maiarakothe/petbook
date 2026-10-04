@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Image from "next/image";
 
 type PetFormData = {
@@ -39,6 +39,8 @@ export default function PetDialog({
     const [localizacao, setLocalizacao] = useState(pet?.localizacao ?? "");
     const [foto, setFoto] = useState<File | null>(null);
     const [fotoPreview, setFotoPreview] = useState(pet?.foto ?? "");
+    const [salvando, setSalvando] = useState(false);
+    const savingRef = useRef(false);
 
     if (!aberto) {
         return null;
@@ -56,25 +58,26 @@ export default function PetDialog({
     }
 
     async function salvar() {
-        if (!nome || !tipo || (!pet && !foto)) {
+        if (savingRef.current || !nome.trim() || !tipo || (!pet && !foto)) {
             return;
         }
 
-        await onSalvar({
-            nome,
-            raca,
-            tipo,
-            idade,
-            localizacao,
-            foto,
-        });
-
+        savingRef.current = true;
+        setSalvando(true);
+        try {
+            await onSalvar({ nome, raca, tipo, idade, localizacao, foto });
+        } finally {
+            savingRef.current = false;
+            setSalvando(false);
+        }
     }
 
     return (
         <div
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
-            onClick={onClose}
+            onClick={() => {
+                if (!salvando) onClose();
+            }}
         >
             <div
                 className="w-full max-w-lg rounded-3xl bg-white p-7 shadow-xl"
@@ -94,6 +97,7 @@ export default function PetDialog({
                     <button
                         type="button"
                         onClick={onClose}
+                        disabled={salvando}
                         className="text-2xl text-gray-400 transition hover:text-[var(--primary)]"
                     >
                         ×
@@ -123,6 +127,7 @@ export default function PetDialog({
                         id="foto-pet"
                         type="file"
                         accept="image/*"
+                        disabled={salvando}
                         className="hidden"
                         onChange={selecionarFoto}
                     />
@@ -143,6 +148,7 @@ export default function PetDialog({
 
                         <input
                             type="text"
+                            disabled={salvando}
                             value={nome}
                             onChange={(event) => setNome(event.target.value)}
                             placeholder="Ex: Mel"
@@ -157,6 +163,7 @@ export default function PetDialog({
 
                         <select
                             value={tipo}
+                            disabled={salvando}
                             onChange={(event) => setTipo(event.target.value)}
                             className="h-12 w-full rounded-xl border border-gray-200 bg-white px-4 outline-none transition focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20"
                         >
@@ -176,6 +183,7 @@ export default function PetDialog({
 
                         <input
                             type="text"
+                            disabled={salvando}
                             value={raca}
                             onChange={(event) => setRaca(event.target.value)}
                             placeholder="Ex: Golden Retriever"
@@ -191,6 +199,7 @@ export default function PetDialog({
 
                             <input
                                 type="text"
+                                disabled={salvando}
                                 value={idade}
                                 onChange={(event) => setIdade(event.target.value)}
                                 placeholder="Ex: 3 anos ou 8 meses"
@@ -206,6 +215,7 @@ export default function PetDialog({
 
                             <input
                                 type="text"
+                                disabled={salvando}
                                 value={localizacao}
                                 onChange={(event) => setLocalizacao(event.target.value)}
                                 placeholder="Ex: Itapiranga - SC"
@@ -219,6 +229,7 @@ export default function PetDialog({
                     <button
                         type="button"
                         onClick={onClose}
+                        disabled={salvando}
                         className="rounded-xl px-5 py-3 font-semibold text-gray-600 transition hover:bg-gray-100"
                     >
                         Cancelar
@@ -227,9 +238,10 @@ export default function PetDialog({
                     <button
                         type="button"
                         onClick={salvar}
-                        className="rounded-xl bg-[var(--primary)] px-5 py-3 font-semibold text-white transition hover:opacity-90"
+                        disabled={salvando || !nome.trim() || !tipo || (!pet && !foto)}
+                        className="rounded-xl bg-[var(--primary)] px-5 py-3 font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
                     >
-                        {pet ? "Salvar alterações" : "Cadastrar pet"}
+                        {salvando ? "Salvando..." : pet ? "Salvar alterações" : "Cadastrar pet"}
                     </button>
                 </div>
             </div>

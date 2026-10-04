@@ -4,8 +4,10 @@ import { useEffect, useState } from "react";
 import PostCard from "@/components/PostCard/PostCard";
 import CreatePostBox from "@/components/CreatePostBox/CreatePostBox";
 import { getPublicacoes, Publicacao } from "@/api/publicacoes";
+import { useSnackbar } from "@/components/Feedback/SnackbarProvider";
 
 export default function AdocaoPage() {
+  const { notify } = useSnackbar();
   const [publicacoes, setPublicacoes] = useState<Publicacao[]>([]);
   const [erro, setErro] = useState("");
 
@@ -14,7 +16,11 @@ export default function AdocaoPage() {
       const dados = await getPublicacoes("ADOCAO");
       setPublicacoes(dados.filter((publicacao) => publicacao.tipo === "ADOCAO"));
     } catch (error) {
-      setErro(error instanceof Error ? error.message : "Erro ao carregar adoções.");
+      const message = error instanceof Error
+        ? error.message
+        : "Não foi possível carregar as publicações de adoção. Tente novamente.";
+      setErro(message);
+      notify(message, "error");
     }
   }
 
@@ -23,10 +29,14 @@ export default function AdocaoPage() {
       .then((dados) => setPublicacoes(
         dados.filter((publicacao) => publicacao.tipo === "ADOCAO"),
       ))
-      .catch((error) => setErro(
-        error instanceof Error ? error.message : "Erro ao carregar adoções.",
-      ));
-  }, []);
+      .catch((error) => {
+        const message = error instanceof Error
+          ? error.message
+          : "Não foi possível carregar as publicações de adoção. Tente novamente.";
+        setErro(message);
+        notify(message, "error");
+      });
+  }, [notify]);
 
   return (
     <main className="layout">

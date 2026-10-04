@@ -1,4 +1,4 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+import { API_URL, fetchApi, readApiResponse } from "@/lib/api";
 
 export async function uploadImage(file: File) {
   const token = localStorage.getItem("petbook_token");
@@ -7,7 +7,7 @@ export async function uploadImage(file: File) {
 
   formData.append("file", file);
 
-  const response = await fetch(`${API_URL}/upload`, {
+  const response = await fetchApi(`${API_URL}/upload`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -15,15 +15,6 @@ export async function uploadImage(file: File) {
     body: formData,
   });
 
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(
-      Array.isArray(data.message)
-        ? data.message.join(", ")
-        : data.message || "Erro ao enviar imagem.",
-    );
-  }
-
+  const data = await readApiResponse<{ url: string }>(response, "Não foi possível enviar a imagem.");
   return data.url;
 }

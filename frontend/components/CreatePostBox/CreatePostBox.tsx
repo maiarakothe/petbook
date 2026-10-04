@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, ChangeEvent, SyntheticEvent } from "react";
+import { useEffect, useRef, useState, ChangeEvent, SyntheticEvent } from "react";
 import Image from "next/image";
 import EmojiPicker, { EmojiClickData } from "emoji-picker-react";
 
@@ -9,6 +9,7 @@ import styles from "./CreatePostBox.module.css";
 import { getPets } from "@/api/pets";
 import { createPublicacao } from "@/api/publicacoes";
 import { API_URL } from "@/lib/api";
+import { useSnackbar } from "@/components/Feedback/SnackbarProvider";
 
 type Pet = {
     id: string;
@@ -43,6 +44,8 @@ export default function CreatePostBox({
         useState(false);
 
     const [loading, setLoading] = useState(false);
+    const submittingRef = useRef(false);
+    const { notify } = useSnackbar();
 
     useEffect(() => {
         async function carregarPets() {
@@ -55,11 +58,17 @@ export default function CreatePostBox({
                     "Erro ao carregar pets:",
                     error,
                 );
+                notify(
+                    error instanceof Error
+                        ? error.message
+                        : "Não foi possível carregar seus pets. Recarregue a página e tente novamente.",
+                    "error",
+                );
             }
         }
 
         carregarPets();
-    }, []);
+    }, [notify]);
 
     const handleImageChange = (
         e: ChangeEvent<HTMLInputElement>,
@@ -105,7 +114,7 @@ export default function CreatePostBox({
     ) => {
         e.preventDefault();
 
-        if (loading) {
+        if (submittingRef.current) {
             return;
         }
 
@@ -114,25 +123,24 @@ export default function CreatePostBox({
         }
 
         if (!selectedImage) {
-            alert("Adicione uma foto para publicar.");
+            notify("Adicione uma foto para publicar.", "error");
             return;
         }
 
         if (pets.length === 0) {
-            alert(
-                "Você precisa ter um pet cadastrado para publicar.",
-            );
+            notify("Cadastre um pet antes de criar uma publicação.", "error");
             return;
         }
 
         const pet = pets[petSelecionado];
 
         if (!pet) {
-            alert("Selecione um pet.");
+            notify("Selecione o pet em nome de quem deseja publicar.", "error");
             return;
         }
 
         try {
+            submittingRef.current = true;
             setLoading(true);
 
             await createPublicacao({
@@ -142,14 +150,20 @@ export default function CreatePostBox({
                 foto: selectedImage,
             });
 
-            alert(
-                "Publicação criada com sucesso!",
-            );
-
             setContent("");
             removerImagem();
             setShowEmojiPicker(false);
-            await onPublicacaoCriada?.();
+            notify("Publicação criada com sucesso!");
+            try {
+                await onPublicacaoCriada?.();
+            } catch (error) {
+                notify(
+                    error instanceof Error
+                        ? `A publicação foi criada, mas a lista não pôde ser atualizada: ${error.message}`
+                        : "A publicação foi criada, mas não foi possível atualizar a lista. Recarregue a página.",
+                    "error",
+                );
+            }
         } catch (error) {
             console.error(
                 "Erro ao criar publicação:",
@@ -157,13 +171,12 @@ export default function CreatePostBox({
             );
 
             if (error instanceof Error) {
-                alert(error.message);
+                notify(error.message, "error");
             } else {
-                alert(
-                    "Erro ao criar publicação.",
-                );
+                notify("Não foi possível criar a publicação. Tente novamente.", "error");
             }
         } finally {
+            submittingRef.current = false;
             setLoading(false);
         }
     };
@@ -189,6 +202,7 @@ export default function CreatePostBox({
             <div className={styles.tabs}>
                 <button
                     type="button"
+                    disabled={loading}
                     onClick={() =>
                         setPostType("comum")
                     }
@@ -202,6 +216,7 @@ export default function CreatePostBox({
 
                 <button
                     type="button"
+                    disabled={loading}
                     onClick={() =>
                         setPostType("adocao")
                     }
@@ -215,6 +230,7 @@ export default function CreatePostBox({
 
                 <button
                     type="button"
+                    disabled={loading}
                     onClick={() =>
                         setPostType("perdidos")
                     }
@@ -267,7 +283,7 @@ export default function CreatePostBox({
                                     )
                                 }
                                 disabled={
-                                    pets.length === 0
+                                    loading || pets.length === 0
                                 }
                                 className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-semibold text-[var(--secondary)] outline-none transition focus:border-[var(--primary)]"
                             >
@@ -301,6 +317,7 @@ export default function CreatePostBox({
                         </div>
 
                         <textarea
+                            disabled={loading}
                             value={content}
                             onChange={(e) =>
                                 setContent(
@@ -341,6 +358,7 @@ export default function CreatePostBox({
 
                                 <button
                                     type="button"
+                                    disabled={loading}
                                     onClick={
                                         removerImagem
                                     }
@@ -384,6 +402,7 @@ export default function CreatePostBox({
                             <input
                                 type="file"
                                 accept="image/*"
+                                disabled={loading}
                                 onChange={
                                     handleImageChange
                                 }
@@ -393,6 +412,7 @@ export default function CreatePostBox({
 
                         <button
                             type="button"
+                            disabled={loading}
                             onClick={() =>
                                 setShowEmojiPicker(
                                     (prev) => !prev,

@@ -1,4 +1,4 @@
-import { API_URL } from '@/lib/api';
+import { API_URL, fetchApi, readApiResponse } from '@/lib/api';
 
 export interface Usuario {
   id: string;
@@ -15,7 +15,7 @@ async function request<T>(
   endpoint: string,
   options?: RequestInit,
 ): Promise<T> {
-  const response = await fetch(`${API_URL}${endpoint}`, {
+  const response = await fetchApi(`${API_URL}${endpoint}`, {
     ...options,
     headers: {
       "Content-Type": "application/json",
@@ -23,17 +23,7 @@ async function request<T>(
     },
   });
 
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(
-      Array.isArray(data.message)
-        ? data.message.join(", ")
-        : data.message || "Ocorreu um erro.",
-    );
-  }
-
-  return data;
+  return readApiResponse<T>(response, "Não foi possível concluir a operação da conta.");
 }
 
 export async function register(

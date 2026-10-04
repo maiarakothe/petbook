@@ -1,14 +1,17 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
 
 import { login, register } from "@/api/auth";
+import { useSnackbar } from "@/components/Feedback/SnackbarProvider";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { notify } = useSnackbar();
+  const submittingRef = useRef(false);
 
   const [modo, setModo] = useState<"login" | "registro">("login");
 
@@ -23,14 +26,18 @@ export default function LoginPage() {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (submittingRef.current) return;
 
     setErro("");
 
     if (modo === "registro" && senha !== confirmarSenha) {
-      setErro("As senhas não coincidem.");
+      const message = "As senhas não coincidem. Confira os dois campos de senha.";
+      setErro(message);
+      notify(message, "error");
       return;
     }
 
+    submittingRef.current = true;
     setLoading(true);
 
     try {
@@ -42,7 +49,7 @@ export default function LoginPage() {
         setSenha("");
         setConfirmarSenha("");
 
-        alert("Conta criada com sucesso!");
+        notify("Conta criada com sucesso! Agora entre com seu e-mail e senha.");
 
         return;
       }
@@ -63,10 +70,14 @@ export default function LoginPage() {
     } catch (error) {
       if (error instanceof Error) {
         setErro(error.message);
+        notify(error.message, "error");
       } else {
-        setErro("Ocorreu um erro. Tente novamente.");
+        const message = "Não foi possível concluir a operação. Tente novamente.";
+        setErro(message);
+        notify(message, "error");
       }
     } finally {
+      submittingRef.current = false;
       setLoading(false);
     }
   }
@@ -129,6 +140,7 @@ export default function LoginPage() {
 
                   <input
                     type="text"
+                    disabled={loading}
                     placeholder="Seu nome"
                     value={nome}
                     onChange={(e) => setNome(e.target.value)}
@@ -145,6 +157,7 @@ export default function LoginPage() {
 
                 <input
                   type="email"
+                  disabled={loading}
                   placeholder="seu@email.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -161,6 +174,7 @@ export default function LoginPage() {
                 <div className="relative">
                   <input
                     type={mostrarSenha ? "text" : "password"}
+                    disabled={loading}
                     placeholder="••••••••"
                     value={senha}
                     onChange={(e) => setSenha(e.target.value)}
@@ -169,6 +183,7 @@ export default function LoginPage() {
                   />
                   <button
                     type="button"
+                    disabled={loading}
                     onClick={() => setMostrarSenha((visivel) => !visivel)}
                     aria-label={mostrarSenha ? "Ocultar senha" : "Mostrar senha"}
                     className="absolute inset-y-0 right-0 flex w-12 items-center justify-center text-gray-500 hover:text-[var(--secondary)]"
@@ -186,6 +201,7 @@ export default function LoginPage() {
 
                   <input
                     type={mostrarSenha ? "text" : "password"}
+                    disabled={loading}
                     placeholder="••••••••"
                     value={confirmarSenha}
                     onChange={(e) =>
@@ -233,6 +249,7 @@ export default function LoginPage() {
 
               <button
                 type="button"
+                disabled={loading}
                 onClick={() => {
                   setModo(
                     modo === "login"

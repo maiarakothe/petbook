@@ -1,13 +1,25 @@
-import { API_URL } from '@/lib/api';
+import { API_URL, fetchApi, readApiResponse } from '@/lib/api';
 
-export async function createPet(pet: {
+export type Pet = {
+  id: string;
+  nome: string;
+  foto: string;
+  raca: string;
+  tipo_animal: string;
+  idade: string;
+  localizacao: string;
+};
+
+type PetInput = {
   nome: string;
   raca: string;
   tipo: string;
   idade: string;
   localizacao: string;
   foto: File | null;
-}) {
+};
+
+export async function createPet(pet: PetInput): Promise<Pet> {
   const token = localStorage.getItem('petbook_token');
 
   const formData = new FormData();
@@ -22,7 +34,7 @@ export async function createPet(pet: {
     formData.append('foto', pet.foto);
   }
 
-  const response = await fetch(`${API_URL}/pets`, {
+  const response = await fetchApi(`${API_URL}/pets`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${token}`,
@@ -30,27 +42,10 @@ export async function createPet(pet: {
     body: formData,
   });
 
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(
-      Array.isArray(data.message)
-        ? data.message.join(', ')
-        : data.message || 'Erro ao cadastrar pet.',
-    );
-  }
-
-  return data;
+  return readApiResponse<Pet>(response, 'Não foi possível cadastrar o pet.');
 }
 
-export async function updatePet(id: string, pet: {
-  nome: string;
-  raca: string;
-  tipo: string;
-  idade: string;
-  localizacao: string;
-  foto: File | null;
-}) {
+export async function updatePet(id: string, pet: PetInput): Promise<Pet> {
   const token = localStorage.getItem('petbook_token');
   const formData = new FormData();
 
@@ -64,7 +59,7 @@ export async function updatePet(id: string, pet: {
     formData.append('foto', pet.foto);
   }
 
-  const response = await fetch(`${API_URL}/pets/${id}`, {
+  const response = await fetchApi(`${API_URL}/pets/${id}`, {
     method: 'PATCH',
     headers: {
       Authorization: `Bearer ${token}`,
@@ -72,51 +67,30 @@ export async function updatePet(id: string, pet: {
     body: formData,
   });
 
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(
-      Array.isArray(data.message)
-        ? data.message.join(', ')
-        : data.message || 'Erro ao atualizar pet.',
-    );
-  }
-
-  return data;
+  return readApiResponse<Pet>(response, 'Não foi possível atualizar o pet.');
 }
 
-export async function getPets() {
+export async function getPets(): Promise<Pet[]> {
   const token = localStorage.getItem("petbook_token");
 
-  const response = await fetch(`${API_URL}/pets`, {
+  const response = await fetchApi(`${API_URL}/pets`, {
     method: "GET",
     headers: {
       Authorization: `Bearer ${token}`,
     },
   });
 
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(
-      Array.isArray(data.message)
-        ? data.message.join(", ")
-        : data.message || "Erro ao buscar pets.",
-    );
-  }
-
-  return data;
+  return readApiResponse<Pet[]>(response, 'Não foi possível carregar os pets.');
 }
 
 export async function deletePet(id: string): Promise<void> {
   const token = localStorage.getItem('petbook_token');
-  const response = await fetch(`${API_URL}/pets/${id}`, {
+  const response = await fetchApi(`${API_URL}/pets/${id}`, {
     method: 'DELETE',
     headers: { Authorization: `Bearer ${token}` },
   });
 
   if (!response.ok) {
-    const data = await response.json();
-    throw new Error(data.message || 'Erro ao excluir pet.');
+    await readApiResponse(response, 'Não foi possível excluir o pet.');
   }
 }

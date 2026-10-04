@@ -6,7 +6,7 @@ import Image from "next/image";
 
 import { MessageCircle, Heart, Pencil, Trash2 } from "lucide-react";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import {
   curtirPublicacao,
@@ -19,6 +19,7 @@ import {
   getComentarios,
 } from "@/api/publicacoes";
 import { API_URL } from "@/lib/api";
+import { useSnackbar } from "@/components/Feedback/SnackbarProvider";
 
 interface PostCardProps {
   id: string;
@@ -55,6 +56,9 @@ export default function PostCard({
   const [textoEdicao, setTextoEdicao] = useState("");
   const [erroComentario, setErroComentario] = useState("");
   const [usuarioId, setUsuarioId] = useState<string | null>(null);
+  const [comentarioEmAcao, setComentarioEmAcao] = useState<string | null>(null);
+  const operationRef = useRef({ like: false, comment: false, commentAction: false });
+  const { notify } = useSnackbar();
 
   const fotoPerfil = petFoto.startsWith("http")
     ? petFoto
@@ -78,6 +82,7 @@ export default function PostCard({
         }
       } catch (error) {
         console.error("Erro ao carregar curtida:", error);
+        notify(error instanceof Error ? error.message : "Não foi possível carregar o estado da curtida.", "error");
       } finally {
         if (ativo) setCarregandoCurtida(false);
       }
@@ -88,7 +93,7 @@ export default function PostCard({
     return () => {
       ativo = false;
     };
-  }, [id]);
+  }, [id, notify]);
 
   useEffect(() => {
     const usuarioSalvo = localStorage.getItem("petbook_usuario");
@@ -105,6 +110,7 @@ export default function PostCard({
   }, []);
 
   async function alternarComentarios() {
+    if (operationRef.current.commentAction || carregandoComentarios) return;
     if (comentariosAbertos) {
       setComentariosAbertos(false);
       return;
@@ -120,19 +126,20 @@ export default function PostCard({
       setTotalComentarios(dados.length);
     } catch (error) {
       console.error("Erro ao carregar comentários:", error);
-      setErroComentario(
-        error instanceof Error
-          ? error.message
-          : "Não foi possível carregar os comentários.",
-      );
+      const message = error instanceof Error
+        ? error.message
+        : "Não foi possível carregar os comentários. Tente novamente.";
+      setErroComentario(message);
+      notify(message, "error");
     } finally {
       setCarregandoComentarios(false);
     }
   }
 
   async function alterarCurtida() {
-    if (carregandoCurtida || alterandoCurtida) return;
+    if (carregandoCurtida || operationRef.current.like) return;
 
+    operationRef.current.like = true;
     try {
       setAlterandoCurtida(true);
 
@@ -147,15 +154,18 @@ export default function PostCard({
       }
     } catch (error) {
       console.error("Erro ao alterar curtida:", error);
+      notify(error instanceof Error ? error.message : "Não foi possível atualizar a curtida. Tente novamente.", "error");
     } finally {
+      operationRef.current.like = false;
       setAlterandoCurtida(false);
     }
   }
 
   async function enviarComentario(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!textoComentario.trim() || enviandoComentario) return;
+    if (!textoComentario.trim() || operationRef.current.comment) return;
 
+    operationRef.current.comment = true;
     try {
       setEnviandoComentario(true);
       setErroComentario("");
@@ -163,20 +173,24 @@ export default function PostCard({
       setComentarios((atuais) => [...atuais, comentario]);
       setTotalComentarios((total) => total + 1);
       setTextoComentario("");
+      notify("Comentário publicado.");
     } catch (error) {
-      setErroComentario(
-        error instanceof Error
-          ? error.message
-          : "Não foi possível publicar o comentário.",
-      );
+      const message = error instanceof Error
+        ? error.message
+        : "Não foi possível publicar o comentário. Tente novamente.";
+      setErroComentario(message);
+      notify(message, "error");
     } finally {
+      operationRef.current.comment = false;
       setEnviandoComentario(false);
     }
   }
 
   async function salvarEdicao(comentarioId: string) {
-    if (!textoEdicao.trim()) return;
+    if (!textoEdicao.trim() || operationRef.current.commentAction) return;
 
+    operationRef.current.commentAction = true;
+    setComentarioEmAcao(comentarioId);
     try {
       setErroComentario("");
       const comentarioAtualizado = await atualizarComentario(
@@ -192,17 +206,23 @@ export default function PostCard({
       setComentarioEmEdicao(null);
       setTextoEdicao("");
     } catch (error) {
-      setErroComentario(
-        error instanceof Error
-          ? error.message
-          : "Não foi possível editar o comentário.",
-      );
+      const message = error instanceof Error
+        ? error.message
+        : "Não foi possível editar o comentário. Tente novamente.";
+      setErroComentario(message);
+      notify(message, "error");
+    } finally {
+      operationRef.current.commentAction = false;
+      setComentarioEmAcao(null);
     }
   }
 
   async function removerComentario(comentarioId: string) {
     if (!window.confirm("Deseja excluir este comentário?")) return;
+    if (operationRef.current.commentAction) return;
 
+    operationRef.current.commentAction = true;
+    setComentarioEmAcao(comentarioId);
     try {
       setErroComentario("");
       await excluirComentario(id, comentarioId);
@@ -210,12 +230,16 @@ export default function PostCard({
         atuais.filter((comentario) => comentario.id !== comentarioId),
       );
       setTotalComentarios((total) => Math.max(0, total - 1));
+      notify("Comentário excluído.");
     } catch (error) {
-      setErroComentario(
-        error instanceof Error
-          ? error.message
-          : "Não foi possível excluir o comentário.",
-      );
+      const message = error instanceof Error
+        ? error.message
+        : "Não foi possível excluir o comentário. Tente novamente.";
+      setErroComentario(message);
+      notify(message, "error");
+    } finally {
+      operationRef.current.commentAction = false;
+      setComentarioEmAcao(null);
     }
   }
 
@@ -293,6 +317,7 @@ export default function PostCard({
           <button
             type="button"
             onClick={alternarComentarios}
+            disabled={carregandoComentarios}
             aria-expanded={comentariosAbertos}
             aria-label={
               comentariosAbertos
@@ -339,13 +364,14 @@ export default function PostCard({
                     <div className={styles.commentActions}>
                       <button
                         type="button"
-                        disabled={!textoEdicao.trim()}
+                        disabled={!textoEdicao.trim() || comentarioEmAcao === comentario.id}
                         onClick={() => salvarEdicao(comentario.id)}
                       >
                         Salvar
                       </button>
                       <button
                         type="button"
+                        disabled={comentarioEmAcao === comentario.id}
                         onClick={() => {
                           setComentarioEmEdicao(null);
                           setTextoEdicao("");
@@ -364,6 +390,7 @@ export default function PostCard({
                     <div className={styles.commentActions}>
                       <button
                         type="button"
+                        disabled={comentarioEmAcao === comentario.id}
                         aria-label="Editar comentário"
                         onClick={() => {
                           setComentarioEmEdicao(comentario.id);

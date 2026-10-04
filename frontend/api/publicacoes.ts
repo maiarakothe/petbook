@@ -1,4 +1,4 @@
-import { API_URL } from '@/lib/api';
+import { API_URL, fetchApi, readApiResponse } from '@/lib/api';
 
 export async function createPublicacao(
   publicacao: {
@@ -33,7 +33,7 @@ export async function createPublicacao(
     publicacao.foto,
   );
 
-  const response = await fetch(
+  const response = await fetchApi(
     `${API_URL}/publicacoes`,
     {
       method: 'POST',
@@ -44,18 +44,7 @@ export async function createPublicacao(
     },
   );
 
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(
-      Array.isArray(data.message)
-        ? data.message.join(', ')
-        : data.message ||
-        'Erro ao criar publicação.',
-    );
-  }
-
-  return data;
+  return readApiResponse(response, 'Não foi possível criar a publicação.');
 }
 
 export type Publicacao = {
@@ -83,34 +72,19 @@ export async function getPublicacoes(
   tipo?: Publicacao['tipo'],
 ): Promise<Publicacao[]> {
   const query = tipo ? `?tipo=${tipo}` : '';
-  const response = await fetch(`${API_URL}/publicacoes${query}`);
-
-  if (!response.ok) {
-    throw new Error("Erro ao carregar publicações.");
-  }
-
-  return response.json();
+  const response = await fetchApi(`${API_URL}/publicacoes${query}`);
+  return readApiResponse<Publicacao[]>(response, "Não foi possível carregar as publicações.");
 }
 
 export async function getMinhasPublicacoes(): Promise<Publicacao[]> {
   const token = localStorage.getItem('petbook_token');
-  const response = await fetch(`${API_URL}/publicacoes/minhas`, {
+  const response = await fetchApi(`${API_URL}/publicacoes/minhas`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
   });
 
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(
-      Array.isArray(data.message)
-        ? data.message.join(', ')
-        : data.message || 'Erro ao carregar suas publicações.',
-    );
-  }
-
-  return data;
+  return readApiResponse<Publicacao[]>(response, "Não foi possível carregar suas publicações.");
 }
 
 export async function updatePublicacao(
@@ -123,32 +97,29 @@ export async function updatePublicacao(
   formData.append('tipo', publicacao.tipo);
   if (publicacao.foto) formData.append('foto', publicacao.foto);
 
-  const response = await fetch(`${API_URL}/publicacoes/${id}`, {
+  const response = await fetchApi(`${API_URL}/publicacoes/${id}`, {
     method: 'PATCH',
     headers: { Authorization: `Bearer ${token}` },
     body: formData,
   });
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.message || 'Erro ao atualizar publicação.');
-  return data;
+  return readApiResponse<Publicacao>(response, "Não foi possível atualizar a publicação.");
 }
 
 export async function deletePublicacao(id: string): Promise<void> {
   const token = localStorage.getItem('petbook_token');
-  const response = await fetch(`${API_URL}/publicacoes/${id}`, {
+  const response = await fetchApi(`${API_URL}/publicacoes/${id}`, {
     method: 'DELETE',
     headers: { Authorization: `Bearer ${token}` },
   });
   if (!response.ok) {
-    const data = await response.json();
-    throw new Error(data.message || 'Erro ao excluir publicação.');
+    await readApiResponse(response, "Não foi possível excluir a publicação.");
   }
 }
 
   export async function curtirPublicacao(publicacaoId: string) {
   const token = localStorage.getItem("petbook_token");
 
-  const response = await fetch(
+  const response = await fetchApi(
     `${API_URL}/publicacoes/${publicacaoId}/curtida`,
     {
       method: "POST",
@@ -158,19 +129,13 @@ export async function deletePublicacao(id: string): Promise<void> {
     },
   );
 
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.message || "Erro ao curtir publicação.");
-  }
-
-  return data;
+  return readApiResponse(response, "Não foi possível curtir a publicação.");
 }
 
   export async function descurtirPublicacao(publicacaoId: string) {
   const token = localStorage.getItem("petbook_token");
 
-  const response = await fetch(
+  const response = await fetchApi(
     `${API_URL}/publicacoes/${publicacaoId}/curtida`,
     {
       method: "DELETE",
@@ -180,13 +145,7 @@ export async function deletePublicacao(id: string): Promise<void> {
     },
   );
 
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.message || "Erro ao remover curtida.");
-  }
-
-  return data;
+  return readApiResponse(response, "Não foi possível remover a curtida.");
 }
 
 export type Curtida = {
@@ -196,15 +155,11 @@ export type Curtida = {
 export async function getCurtidasPublicacao(
   publicacaoId: string,
 ): Promise<Curtida[]> {
-  const response = await fetch(
+  const response = await fetchApi(
     `${API_URL}/publicacoes/${publicacaoId}/curtida`,
   );
 
-  if (!response.ok) {
-    throw new Error("Erro ao carregar curtidas da publicação.");
-  }
-
-  return response.json();
+  return readApiResponse<Curtida[]>(response, "Não foi possível carregar as curtidas.");
 }
 
 export type Comentario = {
@@ -224,7 +179,7 @@ async function requestComentarios<T>(
   options: RequestInit = {},
 ): Promise<T> {
   const token = localStorage.getItem("petbook_token");
-  const response = await fetch(
+  const response = await fetchApi(
     `${API_URL}/publicacoes/${encodeURIComponent(publicacaoId)}/comentarios${path}`,
     {
       ...options,
@@ -235,26 +190,7 @@ async function requestComentarios<T>(
     },
   );
 
-  const responseText = await response.text();
-  if (!responseText) {
-    if (!response.ok) {
-      throw new Error("Não foi possível concluir a operação de comentário.");
-    }
-    return undefined as T;
-  }
-
-  const data = JSON.parse(responseText) as {
-    message?: string | string[];
-  } & T;
-  if (!response.ok) {
-    throw new Error(
-      Array.isArray(data.message)
-        ? data.message.join(", ")
-        : data.message || "Não foi possível concluir a operação de comentário.",
-    );
-  }
-
-  return data;
+  return readApiResponse<T>(response, "Não foi possível concluir a operação de comentário.");
 }
 
 export function getComentarios(

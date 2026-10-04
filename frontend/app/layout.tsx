@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import HeaderConditional from "@/components/Header/HeaderConditional";
+import { SnackbarProvider } from "@/components/Feedback/SnackbarProvider";
 
 export const metadata: Metadata = {
   title: "PetBook",
@@ -15,8 +16,10 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body>
-        <HeaderConditional />
-        {children}
+        <SnackbarProvider>
+          <HeaderConditional />
+          {children}
+        </SnackbarProvider>
       </body>
     </html>
   );

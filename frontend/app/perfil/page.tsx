@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import PetMenu from "@/components/Perfil/PetMenu";
@@ -9,7 +9,7 @@ import UserProfile from "@/components/Perfil/UserProfile";
 import PetDialog from "@/components/Perfil/PetDialog";
 
 
-import { createPet, deletePet, getPets, updatePet } from "@/api/pets";
+import { createPet, deletePet, getPets, updatePet, type Pet } from "@/api/pets";
 import { updateProfile, type Usuario } from "@/api/auth";
 import {
   getMinhasPublicacoes,
@@ -19,20 +19,12 @@ import {
 } from "@/api/publicacoes";
 import UserDialog from "@/components/Perfil/UserDialog";
 import PostDialog from "@/components/Perfil/PostDialog";
-
-type Pet = {
-  id: string;
-  nome: string;
-  foto: string;
-  raca: string;
-  tipo_animal: string;
-  idade: string;
-  localizacao: string;
-  publicacoes?: number;
-};
+import { useSnackbar } from "@/components/Feedback/SnackbarProvider";
 
 export default function PerfilPage() {
   const router = useRouter();
+  const { notify } = useSnackbar();
+  const deletingRef = useRef(false);
   const [petSelecionado, setPetSelecionado] = useState(0);
   const [dialogPetAberto, setDialogPetAberto] = useState(false);
   const [dialogUsuarioAberto, setDialogUsuarioAberto] = useState(false);
@@ -82,13 +74,14 @@ export default function PerfilPage() {
         } else {
           setErro("Erro ao carregar perfil.");
         }
+        notify(error instanceof Error ? error.message : "Não foi possível carregar seu perfil.", "error");
       } finally {
         setLoading(false);
       }
     }
 
     carregarPerfil();
-  }, [router]);
+  }, [router, notify]);
 
   if (loading) {
     return (
@@ -133,6 +126,7 @@ export default function PerfilPage() {
               localStorage.setItem("petbook_usuario", JSON.stringify(usuarioAtualizado));
               setUsuario(usuarioAtualizado);
               setDialogUsuarioAberto(false);
+              notify("Informações da conta atualizadas com sucesso.");
             }}
           />
         )}
@@ -160,22 +154,36 @@ export default function PerfilPage() {
                 setDialogPetAberto(true);
               }}
               onExcluir={async () => {
+                if (deletingRef.current) return;
                 if (!confirm(`Excluir ${pets[petSelecionado].nome} e todas as suas publicações?`)) return;
+                deletingRef.current = true;
                 try {
                   const id = pets[petSelecionado].id;
                   await deletePet(id);
                   setPets((atuais) => atuais.filter((pet) => pet.id !== id));
                   setPublicacoes((atuais) => atuais.filter((publicacao) => publicacao.pet.id !== id));
                   setPetSelecionado(0);
-                } catch (error) { alert(error instanceof Error ? error.message : "Erro ao excluir pet."); }
+                  notify("Pet e publicações relacionadas excluídos com sucesso.");
+                } catch (error) {
+                  notify(error instanceof Error ? error.message : "Não foi possível excluir o pet. Tente novamente.", "error");
+                } finally {
+                  deletingRef.current = false;
+                }
               }}
               onEditarPublicacao={setPublicacaoEmEdicao}
               onExcluirPublicacao={async (publicacao) => {
+                if (deletingRef.current) return;
                 if (!confirm("Excluir esta publicação?")) return;
+                deletingRef.current = true;
                 try {
                   await deletePublicacao(publicacao.id);
                   setPublicacoes((atuais) => atuais.filter((item) => item.id !== publicacao.id));
-                } catch (error) { alert(error instanceof Error ? error.message : "Erro ao excluir publicação."); }
+                  notify("Publicação excluída com sucesso.");
+                } catch (error) {
+                  notify(error instanceof Error ? error.message : "Não foi possível excluir a publicação. Tente novamente.", "error");
+                } finally {
+                  deletingRef.current = false;
+                }
               }}
             />
           )}
@@ -205,7 +213,7 @@ export default function PerfilPage() {
                     setPets((petsAtuais) => petsAtuais.map((petAtual) =>
                       petAtual.id === petAtualizado.id ? petAtualizado : petAtual,
                     ));
-                    alert("Pet atualizado com sucesso!");
+                    notify("Pet atualizado com sucesso.");
                   } else {
                     const novoPet = await createPet(pet);
 
@@ -216,17 +224,13 @@ export default function PerfilPage() {
 
                     setPetSelecionado(pets.length);
 
-                    alert("Pet cadastrado com sucesso!");
+                    notify("Pet cadastrado com sucesso.");
                   }
 
                   setDialogPetAberto(false);
                   setPetEmEdicao(null);
                 } catch (error) {
-                  if (error instanceof Error) {
-                    alert(error.message);
-                  } else {
-                    alert("Erro ao cadastrar pet.");
-                  }
+                  notify(error instanceof Error ? error.message : "Não foi possível salvar o pet. Confira os dados e tente novamente.", "error");
                 }
               }}
             />
@@ -238,7 +242,10 @@ export default function PerfilPage() {
                 const atualizada = await updatePublicacao(publicacaoEmEdicao.id, dados);
                 setPublicacoes((atuais) => atuais.map((item) => item.id === atualizada.id ? { ...item, ...atualizada } : item));
                 setPublicacaoEmEdicao(null);
-              } catch (error) { alert(error instanceof Error ? error.message : "Erro ao atualizar publicação."); }
+                notify("Publicação atualizada com sucesso.");
+              } catch (error) {
+                notify(error instanceof Error ? error.message : "Não foi possível atualizar a publicação. Tente novamente.", "error");
+              }
             }} />
           )}
 

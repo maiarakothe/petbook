@@ -6,9 +6,11 @@ import { useRouter } from "next/navigation";
 import CreatePostBox from "@/components/CreatePostBox/CreatePostBox";
 import PostCard from "@/components/PostCard/PostCard";
 import { getPublicacoes, Publicacao } from "@/api/publicacoes";
+import { useSnackbar } from "@/components/Feedback/SnackbarProvider";
 
 export default function Feed() {
   const router = useRouter();
+  const { notify } = useSnackbar();
   const [publicacoes, setPublicacoes] = useState<Publicacao[]>([]);
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState("");
@@ -26,18 +28,18 @@ export default function Feed() {
         const dados = await getPublicacoes();
         setPublicacoes(dados);
       } catch (error) {
-        setErro(
-          error instanceof Error
-            ? error.message
-            : "Erro ao carregar publicações.",
-        );
+        const message = error instanceof Error
+          ? error.message
+          : "Não foi possível carregar as publicações. Tente novamente.";
+        setErro(message);
+        notify(message, "error");
       } finally {
         setLoading(false);
       }
     }
 
     carregarPublicacoes();
-  }, [router]);
+  }, [router, notify]);
 
   return (
     <div>

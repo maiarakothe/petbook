@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { Usuario } from "@/api/auth";
+import { useSnackbar } from "@/components/Feedback/SnackbarProvider";
 
 type UserDialogProps = {
     aberto: boolean;
@@ -20,20 +21,29 @@ export default function UserDialog({
     const [email, setEmail] = useState(usuario.email);
     const [erro, setErro] = useState("");
     const [salvando, setSalvando] = useState(false);
+    const savingRef = useRef(false);
+    const { notify } = useSnackbar();
 
     if (!aberto) {
         return null;
     }
 
     async function salvar() {
+        if (savingRef.current) return;
+        savingRef.current = true;
         setSalvando(true);
         setErro("");
 
         try {
             await onSalvar({ nome, email });
         } catch (error) {
-            setErro(error instanceof Error ? error.message : "Erro ao atualizar conta.");
+            const message = error instanceof Error
+                ? error.message
+                : "Não foi possível atualizar sua conta. Tente novamente.";
+            setErro(message);
+            notify(message, "error");
         } finally {
+            savingRef.current = false;
             setSalvando(false);
         }
     }
@@ -41,7 +51,9 @@ export default function UserDialog({
     return (
         <div
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
-            onClick={onClose}
+            onClick={() => {
+                if (!salvando) onClose();
+            }}
         >
             <section
                 role="dialog"
@@ -54,7 +66,7 @@ export default function UserDialog({
                     <h2 id="editar-conta-titulo" className="text-xl font-bold text-[var(--secondary)]">
                         Editar informações
                     </h2>
-                    <button type="button" onClick={onClose} aria-label="Fechar" className="text-2xl text-gray-400">
+                    <button type="button" onClick={onClose} disabled={salvando} aria-label="Fechar" className="text-2xl text-gray-400 disabled:opacity-50">
                         ×
                     </button>
                 </div>
@@ -64,6 +76,7 @@ export default function UserDialog({
                         Nome
                         <input
                             value={nome}
+                            disabled={salvando}
                             onChange={(event) => setNome(event.target.value)}
                             required
                             className="mt-1 h-11 w-full rounded-lg border border-gray-200 px-3 font-normal outline-none focus:border-[var(--primary)]"
@@ -74,6 +87,7 @@ export default function UserDialog({
                         <input
                             type="email"
                             value={email}
+                            disabled={salvando}
                             onChange={(event) => setEmail(event.target.value)}
                             required
                             className="mt-1 h-11 w-full rounded-lg border border-gray-200 px-3 font-normal outline-none focus:border-[var(--primary)]"
@@ -84,7 +98,7 @@ export default function UserDialog({
                 {erro && <p role="alert" className="mt-3 text-sm text-red-600">{erro}</p>}
 
                 <div className="mt-6 flex justify-end gap-3">
-                    <button type="button" onClick={onClose} className="rounded-lg px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-100">
+                    <button type="button" onClick={onClose} disabled={salvando} className="rounded-lg px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-100 disabled:opacity-50">
                         Cancelar
                     </button>
                     <button
