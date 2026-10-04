@@ -4,6 +4,13 @@ O PetBook é uma aplicação full stack para conectar tutores de pets, compartil
 
 A proposta da plataforma é unir um feed social com um perfil de pet, permitindo que o usuário gerencie seus animais, publique conteúdos, interaja com o feed e acompanhe o engajamento com curtidas em publicações.
 
+
+## 🚀 Aplicação online
+
+Acesse o PetBook:
+
+👉 https://petbook-site.vercel.app/
+
 ---
 
 ## ✨ Funcionalidades
