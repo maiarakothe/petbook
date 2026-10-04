@@ -7,10 +7,8 @@ A proposta da plataforma é unir um feed social com um perfil de pet, permitindo
 
 ## 🚀 Aplicação online
 
-Acesse o PetBook:
-
-👉 https://petbook-site.vercel.app/
-
+- **Acesse o PetBook:** https://petbook-site.vercel.app/
+- **Vídeo de apresentação:** https://youtu.be/8uKaz94aiE8
 ---
 
 ## ✨ Funcionalidades
